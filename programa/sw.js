@@ -1,6 +1,6 @@
 // Red primero, caché de respaldo: si no hay señal en la iglesia, la app abre igual
 // con la última versión que se vio, y cuando hay señal siempre trae la más nueva.
-const CACHE = "programa-dia-evangelico-v1";
+const CACHE = "programa-dia-evangelico-v2";
 const BASE = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -18,7 +18,7 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: "no-cache" })
       .then((r) => {
         if (r.ok && new URL(e.request.url).origin === location.origin) {
           const copia = r.clone();
