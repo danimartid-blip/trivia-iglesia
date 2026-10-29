@@ -1,5 +1,5 @@
 import { db, MODO } from "./db.js";
-import { PREGUNTAS, FORMAS, PERSONAJES } from "./datos.js";
+import { PREGUNTAS, RONDAS, FORMAS, PERSONAJES } from "./datos.js";
 
 const app = document.getElementById("app");
 const params = new URLSearchParams(location.search);
@@ -158,11 +158,23 @@ function pintar() {
       cuerpo = `<div class="gigante">🙈</div><h2 class="mal">Casi…</h2><p>La respuesta era <b>${P.opciones[P.correcta]}</b>.</p>`;
     }
     html += `<div class="resultado">${cuerpo}${de > 1 && P.tipo === "trivia" ? `<p>Vas en el puesto <b>${n}</b> de ${de}. Solo tú ves esto.</p>` : ""}</div>`;
-  } else if (juego.estado === "fin") {
+  } else if (juego.estado === "intro") {
+    const R = RONDAS[juego.ronda];
+    html += `<div class="centro"><p class="eyebrow">Ronda ${juego.ronda + 1} de ${RONDAS.length}</p>
+      <h1>${R.titulo}</h1><p>${R.sub}</p>
+      ${juego.ronda > 0 ? `<div class="gigante">${yo.emoji}</div><h2>Ahora eres ${yo.animal}</h2>
+      <span class="secreto">🔀 Tu personaje cambió y tus puntos volvieron a cero</span>` : ""}</div>`;
+  } else if (juego.estado === "ronda-fin") {
     const { n, de } = puesto();
-    html += `<div class="resultado"><div class="gigante">${n === 1 ? "🏆" : "🙌"}</div>
-      <h2>${n === 1 ? "¡Ganaste!" : "¡Gracias por jugar!"}</h2>
-      <p>Quedaste en el puesto <b>${n}</b> de ${de}.</p>${n === 1 ? `<p>Levanta la mano si quieres… o guárdalo en secreto 🤫</p>` : ""}</div>`;
+    const hayPuntos = ((players[pid]?.puntos) || 0) > 0;
+    html += `<div class="resultado"><div class="gigante">${n === 1 && hayPuntos ? "🏆" : "🙌"}</div>
+      <h2>${n === 1 && hayPuntos ? "¡Ganaste la ronda!" : "Terminó la ronda"}</h2>
+      ${hayPuntos ? `<p>Quedaste en el puesto <b>${n}</b> de ${de}. Solo tú ves esto.</p>` : ""}
+      ${n === 1 && hayPuntos ? `<p>Levanta la mano si quieres… o guárdalo en secreto 🤫</p>` : ""}
+      <p>Mira la pantalla: viene un cambio de personaje.</p></div>`;
+  } else if (juego.estado === "fin") {
+    html += `<div class="resultado"><div class="gigante">🙌</div><h2>¡Gracias por jugar!</h2>
+      <p>Mira la pantalla para ver a los ganadores de cada ronda.</p></div>`;
   }
 
   app.innerHTML = html;

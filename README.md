@@ -52,5 +52,7 @@ La dirección queda como `https://TU-USUARIO.github.io/trivia-iglesia/anfitrion.
 2. La gente escanea el QR (o entra a `jugar.html` y escribe el código).
 3. Cuando estén todos, toca **Empezar**. Con Espacio o Enter pasas a la siguiente.
 4. La pregunta se cierra sola cuando todos responden o se acaba el tiempo.
+5. El juego va en **3 rondas** (Biblia · Reforma y Chile evangélico · Sondeos). Al terminar cada ronda con puntos sale el ganador; al seguir, los personajes se barajan y los puntos vuelven a cero. La última ronda es de sondeos (sin puntos) y el juego cierra con un resumen de los ganadores. Las rondas y preguntas se editan en `js/datos.js`.
+6. Antes de empezar, si quedó una partida anterior, toca **Partida nueva**.
 
 Prueba todo con 2 o 3 celulares **antes** del domingo. Después de la actividad puedes borrar el proyecto de Firebase.

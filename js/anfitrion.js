@@ -1,5 +1,5 @@
 import { db, MODO, lista } from "./db.js";
-import { PREGUNTAS, FORMAS } from "./datos.js";
+import { PREGUNTAS, RONDAS, FORMAS, PERSONAJES } from "./datos.js";
 
 const app = document.getElementById("app");
 
@@ -17,8 +17,9 @@ const nuevoCodigo = () => Array.from({ length: 4 }, () => ALFABETO[Math.floor(Ma
 let sala = localStorage.getItem("trivia_sala");
 if (!sala) { sala = nuevoCodigo(); localStorage.setItem("trivia_sala", sala); }
 
-let juego = { estado: "lobby", q: -1 };
+let juego = { estado: "lobby", q: -1, ronda: 0 };
 let players = {};
+let ganadores = {};
 let res = {};
 let resp = {};
 let vistaActual = "";
@@ -37,10 +38,11 @@ const urlJugar = () => {
 
 async function arrancar() {
   const j = await db.get(ruta("juego"));
-  if (!j) await db.set(ruta("juego"), { estado: "lobby", q: -1 });
-  db.listen(ruta("juego"), (v) => { juego = v || { estado: "lobby", q: -1 }; alCambiarJuego(); });
+  if (!j) await db.set(ruta("juego"), { estado: "lobby", q: -1, ronda: 0 });
+  db.listen(ruta("juego"), (v) => { juego = v || { estado: "lobby", q: -1, ronda: 0 }; alCambiarJuego(); });
   db.listen(ruta("players"), (v) => { players = v || {}; alCambiarJugadores(); });
-  db.listen(ruta("res"), (v) => { res = v || {}; if (juego.estado === "resultado" || juego.estado === "fin") pintar(true); });
+  db.listen(ruta("ganadores"), (v) => { ganadores = v || {}; if (juego.estado === "fin") pintar(true); });
+  db.listen(ruta("res"), (v) => { res = v || {}; if (juego.estado === "resultado") pintar(true); });
   setInterval(tick, 200);
   addEventListener("keydown", (e) => {
     if (["Enter", " ", "ArrowRight"].includes(e.key) && !e.target.closest("button, input")) {
@@ -96,7 +98,38 @@ function tick() {
 async function iniciarPregunta(q) {
   revelando = false;
   await db.remove(ruta(`resp/${q}`));
-  await db.set(ruta("juego"), { estado: "pregunta", q, inicio: Math.round(db.now()), segundos: PREGUNTAS[q].segundos });
+  await db.set(ruta("juego"), { estado: "pregunta", q, ronda: PREGUNTAS[q].ronda, inicio: Math.round(db.now()), segundos: PREGUNTAS[q].segundos });
+}
+
+const irAIntro = (ronda) => db.set(ruta("juego"), { estado: "intro", q: -1, ronda });
+const primeraDe = (ronda) => PREGUNTAS.findIndex((p) => p.ronda === ronda);
+const hayTrivia = (ronda) => RONDAS[ronda].preguntas.some((p) => p.tipo === "trivia");
+const esFinDeRonda = (q) => q + 1 >= PREGUNTAS.length || PREGUNTAS[q + 1].ronda !== PREGUNTAS[q].ronda;
+const clasificacion = (ps) => Object.values(ps).sort((a, b) => b.puntos - a.puntos);
+
+async function cerrarRonda(ronda) {
+  const orden = clasificacion((await db.get(ruta("players"))) || {});
+  const g = orden[0] && orden[0].puntos > 0 ? { animal: orden[0].animal, emoji: orden[0].emoji, puntos: orden[0].puntos } : null;
+  if (g) await db.set(ruta(`ganadores/${ronda}`), g);
+  await db.set(ruta("juego"), { estado: "ronda-fin", q: juego.q, ronda });
+}
+
+// Nuevos personajes para todos y puntos en cero: así el ganador de una ronda no se puede rastrear en la siguiente.
+async function barajar() {
+  const actuales = (await db.get(ruta("players"))) || {};
+  const idx = PERSONAJES.map((_, i) => i).sort(() => Math.random() - 0.5);
+  const upd = {};
+  const tomados = {};
+  Object.keys(actuales).forEach((pid, k) => {
+    const par = idx[k] !== undefined ? PERSONAJES[idx[k]] : [`Visita ${k + 1}`, "🙂"];
+    if (idx[k] !== undefined) tomados[idx[k]] = pid;
+    upd[`${pid}/animal`] = par[0];
+    upd[`${pid}/emoji`] = par[1];
+    upd[`${pid}/puntos`] = 0;
+    upd[`${pid}/ultimo`] = 0;
+  });
+  await db.update(ruta("players"), upd);
+  await db.set(ruta("tomados"), Object.keys(tomados).length ? tomados : null);
 }
 
 async function revelar() {
@@ -132,10 +165,19 @@ async function revelar() {
 }
 
 async function siguiente() {
-  if (juego.estado === "lobby") return iniciarPregunta(0);
-  if (juego.estado === "pregunta") return revelar();
-  if (juego.estado === "resultado") {
-    return juego.q + 1 < PREGUNTAS.length ? iniciarPregunta(juego.q + 1) : db.update(ruta("juego"), { estado: "fin" });
+  const e = juego.estado;
+  if (e === "lobby") return irAIntro(0);
+  if (e === "intro") return iniciarPregunta(primeraDe(juego.ronda));
+  if (e === "pregunta") return revelar();
+  if (e === "resultado") {
+    if (!esFinDeRonda(juego.q)) return iniciarPregunta(juego.q + 1);
+    const r = PREGUNTAS[juego.q].ronda;
+    if (hayTrivia(r)) return cerrarRonda(r);
+    return r + 1 < RONDAS.length ? irAIntro(r + 1) : db.set(ruta("juego"), { estado: "fin", q: juego.q, ronda: r });
+  }
+  if (e === "ronda-fin") {
+    if (juego.ronda + 1 < RONDAS.length) { await barajar(); return irAIntro(juego.ronda + 1); }
+    return db.set(ruta("juego"), { estado: "fin", q: juego.q, ronda: juego.ronda });
   }
 }
 
@@ -149,10 +191,10 @@ async function nuevaPartida() {
 /* ---------------- vistas ---------------- */
 
 function pintar(forzar = false) {
-  const clave = `${juego.estado}:${juego.q}`;
+  const clave = `${juego.estado}:${juego.q}:${juego.ronda}`;
   if (!forzar && clave === vistaActual) return;
   vistaActual = clave;
-  const v = { lobby: vistaLobby, pregunta: vistaPregunta, resultado: vistaResultado, fin: vistaFin }[juego.estado] || vistaLobby;
+  const v = { lobby: vistaLobby, intro: vistaIntro, pregunta: vistaPregunta, resultado: vistaResultado, "ronda-fin": vistaRondaFin, fin: vistaFin }[juego.estado] || vistaLobby;
   app.innerHTML = v();
   document.getElementById("principal")?.addEventListener("click", siguiente);
   document.getElementById("btnNueva")?.addEventListener("click", nuevaPartida);
@@ -199,11 +241,50 @@ function pintarAnimales() {
   if (btn) btn.textContent = ps.length ? `Empezar con ${ps.length} jugando` : "Empezar";
 }
 
+function etiqueta(q) {
+  const r = PREGUNTAS[q].ronda;
+  const enRonda = PREGUNTAS.filter((p) => p.ronda === r);
+  const n = PREGUNTAS.slice(0, q + 1).filter((p) => p.ronda === r).length;
+  return `Ronda ${r + 1} de ${RONDAS.length} · ${RONDAS[r].titulo} · Pregunta ${n} de ${enRonda.length}`;
+}
+
+function vistaIntro() {
+  const r = juego.ronda;
+  const R = RONDAS[r];
+  const n = R.preguntas.length;
+  return `<div class="host"><div class="fin">
+    <p class="eyebrow">Ronda ${r + 1} de ${RONDAS.length}</p>
+    <h1>${R.titulo}</h1>
+    <p class="sub">${R.sub}</p>
+    <p class="vacio">${n} preguntas · ${hayTrivia(r) ? "suman puntos y hay ganador" : "sin puntos, para reírnos un rato"}</p>
+    ${r > 0 ? `<p class="dato">🔀 Se barajaron los personajes: mira tu celular para ver quién eres ahora. Los puntos volvieron a cero.</p>` : ""}
+    <div class="acciones"><button class="btn" id="principal">Empezar la ronda</button></div>
+  </div></div>`;
+}
+
+function vistaRondaFin() {
+  const r = juego.ronda;
+  const orden = clasificacion(players).slice(0, 3);
+  const col = (p, pos) => p ? `<div class="col" style="animation-delay:${pos === 1 ? 600 : pos === 2 ? 300 : 0}ms">
+      <span class="emo">${p.emoji}</span><span class="nom">${p.animal}</span><span class="pts">${p.puntos} pts</span>
+      <div class="peldano">${pos}</div></div>` : "";
+  const g = orden[0] && orden[0].puntos > 0 ? orden[0] : null;
+  const empate = g && orden[1] && orden[1].puntos === g.puntos;
+  const hay = r + 1 < RONDAS.length;
+  return `<div class="host"><div class="fin">
+    <p class="eyebrow">Ronda ${r + 1} · ${RONDAS[r].titulo}</p>
+    <h1>${g ? (empate ? "¡Empate en la cima!" : `¡Gana ${g.animal} ${g.emoji}!`) : "Nadie sumó puntos esta ronda"}</h1>
+    ${g ? `<div class="podio">${col(orden[1], 2)}${col(orden[0], 1)}${col(orden[2], 3)}</div>
+    <p class="vacio">Si eres ese personaje, levanta la mano… o quédate en secreto. 🤫</p>` : ""}
+    <div class="acciones"><button class="btn" id="principal">${hay ? `Barajar personajes y seguir con la ronda ${r + 2}` : "Terminar"}</button></div>
+  </div></div>`;
+}
+
 function vistaPregunta() {
   const P = PREGUNTAS[juego.q];
   const cuerpo = P.opciones.map((o, i) => `<div class="tile op-${i}"><span class="forma">${FORMAS[i]}</span><span>${o}</span></div>`).join("");
   return `<div class="host q">
-    <div class="host-top"><span class="eyebrow">Pregunta ${juego.q + 1} de ${PREGUNTAS.length}${P.tipo === "sondeo" ? " · Sondeo: no hay respuesta mala" : ""}</span>
+    <div class="host-top"><span class="eyebrow">${etiqueta(juego.q)}${P.tipo === "sondeo" ? " · Sondeo: no hay respuesta mala" : ""}</span>
       <span class="cuenta" id="cuenta"></span></div>
     <h2 class="pregunta">${P.texto}</h2>
     <div class="tiles" style="--n:${P.opciones.length}">${cuerpo}</div>
@@ -226,9 +307,13 @@ function vistaResultado() {
       <span class="conteo">${c}</span><span class="relleno" style="width:${Math.round((c / total) * 100)}%"></span></div>`;
   }).join("");
   const top = lista(r.top);
-  const ultima = juego.q + 1 >= PREGUNTAS.length;
+  const finRonda = esFinDeRonda(juego.q);
+  const rr = P.ronda;
+  const textoBoton = !finRonda ? "Siguiente"
+    : hayTrivia(rr) ? "Ver al ganador de la ronda"
+    : rr + 1 < RONDAS.length ? `Seguir con la ronda ${rr + 2}` : "Terminar";
   return `<div class="host q">
-    <div class="host-top"><span class="eyebrow">Pregunta ${juego.q + 1} de ${PREGUNTAS.length} · Resultado</span></div>
+    <div class="host-top"><span class="eyebrow">${etiqueta(juego.q)} · Resultado</span></div>
     <h2 class="pregunta">${P.texto}</h2>
     <div class="res-grid">
       <div style="display:flex;flex-direction:column;gap:1.6vw">
@@ -239,21 +324,18 @@ function vistaResultado() {
         <ol>${top.length ? top.map((t, i) => `<li style="animation-delay:${i * 80}ms"><span class="n">${i + 1}</span><span>${t.emoji} ${t.animal}</span><span class="p">${t.puntos}</span></li>`).join("") : "<li>—</li>"}</ol>
       </div>
     </div>
-    <div class="acciones"><button class="btn" id="principal">${ultima ? "Ver el podio" : "Siguiente"}</button></div>
+    <div class="acciones"><button class="btn" id="principal">${textoBoton}</button></div>
   </div>`;
 }
 
 function vistaFin() {
-  const orden = Object.values(players).sort((a, b) => b.puntos - a.puntos).slice(0, 3);
-  const col = (p, pos) => p ? `<div class="col" style="animation-delay:${pos === 1 ? 600 : pos === 2 ? 300 : 0}ms">
-      <span class="emo">${p.emoji}</span><span class="nom">${p.animal}</span><span class="pts">${p.puntos} pts</span>
-      <div class="peldano">${pos}</div></div>` : "";
-  const gana = orden[0];
+  const filas = RONDAS.map((R, r) => ({ R, r, g: ganadores[r] })).filter((x) => x.g);
   return `<div class="host"><div class="fin">
     <p class="eyebrow">Fin del juego</p>
-    <h1>${gana ? `¡Gana ${gana.animal} ${gana.emoji}!` : "¡Gracias por jugar!"}</h1>
-    <div class="podio">${col(orden[1], 2)}${col(orden[0], 1)}${col(orden[2], 3)}</div>
-    <p class="vacio">Si eres ese personaje, levanta la mano… o quédate en secreto. 🤫</p>
+    <h1>¡Gracias por jugar!</h1>
+    ${filas.length ? `<div class="recap">${filas.map(({ R, r, g }, i) => `<div class="fila" style="animation-delay:${i * 200}ms">
+      <span class="rn">Ronda ${r + 1} · ${R.titulo}</span><span class="gan">${g.emoji} ${g.animal}</span><span class="pts">${g.puntos} pts</span></div>`).join("")}</div>
+    <p class="vacio">Si eras alguno de esos personajes, levanta la mano… o quédate en secreto. 🤫</p>` : ""}
     <div class="acciones"><button class="btn ghost" id="btnNueva">Partida nueva</button></div>
   </div></div>`;
 }

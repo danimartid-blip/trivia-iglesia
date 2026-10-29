@@ -209,3 +209,12 @@ button { font: inherit; color: inherit; }
   .lobby, .res-grid { grid-template-columns: 1fr; }
   .tiles { grid-template-columns: 1fr; }
 }
+
+/* ---------------- rondas ---------------- */
+.fin .sub { font-size: clamp(16px, 2vw, 32px); color: var(--text-secondary); max-width: 40ch; line-height: 1.4; }
+.fin .dato { max-width: 52ch; }
+.recap { display: flex; flex-direction: column; gap: 1vw; width: 100%; max-width: 900px; }
+.recap .fila { display: flex; align-items: center; gap: 2vw; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 1.2vw 2vw; animation: pop .5s var(--ease) both; }
+.recap .rn { color: var(--text-muted); font-size: clamp(14px, 1.6vw, 24px); font-weight: 700; text-align: left; flex: 1; }
+.recap .gan { font-size: clamp(18px, 2.6vw, 40px); font-weight: 850; }
+.recap .pts { color: var(--accent-ink); font-weight: 800; font-variant-numeric: tabular-nums; font-size: clamp(14px, 1.6vw, 24px); min-width: 7ch; text-align: right; }
