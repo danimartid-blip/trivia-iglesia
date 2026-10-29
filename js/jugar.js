@@ -50,9 +50,10 @@ async function unirse() {
   pid = store.getItem(`trivia_pid_${sala}`);
   let existente = pid ? await db.get(ruta(`players/${pid}`)) : null;
   if (!existente) {
-    pid = Math.random().toString(36).slice(2, 10);
+    // el id se guarda ANTES de pedir personaje: si la página se recarga a medio camino
+    // (señal lenta, volver atrás), el mismo celular recupera su personaje y no toma otro
+    if (!pid) { pid = Math.random().toString(36).slice(2, 10); store.setItem(`trivia_pid_${sala}`, pid); }
     yo = await asignarAnimal(pid);
-    store.setItem(`trivia_pid_${sala}`, pid);
   } else {
     yo = existente;
   }
@@ -64,7 +65,11 @@ async function unirse() {
 async function asignarAnimal(id) {
   const orden = PERSONAJES.map((_, i) => i).sort(() => Math.random() - 0.5);
   let animal = null;
-  for (const i of orden) {
+  // si este celular ya había reservado uno y se cortó antes de guardarse, lo recupera
+  const tomados = (await db.get(ruta("tomados"))) || {};
+  const previo = Object.keys(tomados).find((k) => tomados[k] === id);
+  if (previo !== undefined && PERSONAJES[previo]) animal = PERSONAJES[previo];
+  if (!animal) for (const i of orden) {
     if (await db.claim(ruta(`tomados/${i}`), id)) { animal = PERSONAJES[i]; break; }
   }
   const [nombre, emoji] = animal || [`Visita ${Math.floor(Math.random() * 90 + 10)}`, "🙂"];
