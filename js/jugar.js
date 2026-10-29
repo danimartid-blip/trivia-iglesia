@@ -77,7 +77,7 @@ function pedirCuriosidad() {
     mensaje(`<div class="curio">
       <div class="gigante">✍️</div>
       <h1>Cuéntanos una curiosidad tuya</h1>
-      <p>Algo que casi nadie sepa de ti. Sin tu nombre: después la leemos y todos adivinamos de quién es.</p>
+      <p>Algo que casi nadie sepa de ti. No lleva tu nombre.</p>
       <div class="ejemplos"><b>Por ejemplo</b>${EJEMPLOS.map((e) => `<span>“${e}”</span>`).join("")}</div>
       <textarea id="cur" maxlength="160" rows="3" placeholder="Escribe aquí tu curiosidad…"></textarea>
       <span class="ayuda">Que sea algo que te dé gusto contar. Si prefieres, tu comida favorita de niño sirve.</span>

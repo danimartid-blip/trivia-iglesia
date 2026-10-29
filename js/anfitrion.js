@@ -48,6 +48,8 @@ async function arrancar() {
   setInterval(tick, 200);
   addEventListener("keydown", (e) => {
     if (document.getElementById("cur-overlay")) return;
+    // atajo discreto: la tecla C abre las curiosidades en cualquier momento
+    if ((e.key === "c" || e.key === "C") && !e.ctrlKey && !e.metaKey && !e.target.closest("input, textarea")) { abrirCuriosidades(); return; }
     if (["Enter", " ", "ArrowRight"].includes(e.key) && !e.target.closest("button, input")) {
       e.preventDefault();
       document.getElementById("principal")?.click();
@@ -221,7 +223,6 @@ function vistaLobby() {
         <div class="animales" id="animales"></div>
         <div class="acciones">
           <button class="btn" id="principal" disabled>Empezar</button>
-          <button class="btn ghost" data-cur hidden></button>
           <span class="vacio" id="nota">Cada uno recibe un personaje de la Biblia al azar: solo tú sabes cuál eres.</span>
         </div>
       </div>
@@ -234,7 +235,7 @@ function actualizarCuriosidades() {
   const n = textosCuriosidades().length;
   document.querySelectorAll("[data-cur]").forEach((b) => {
     b.hidden = n === 0;
-    b.textContent = `📝 Curiosidades (${n})`;
+    b.textContent = "📝 Ver curiosidades";
   });
 }
 
