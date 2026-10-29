@@ -235,11 +235,25 @@ function pintarAnimales() {
   if (!el) return;
   const ps = Object.values(players);
   el.innerHTML = ps.length
-    ? ps.map((p) => `<span class="chip"><span class="emo">${p.emoji}</span>${p.animal}</span>`).join("")
+    ? Object.entries(players).map(([id, p]) => `<span class="chip"><span class="emo">${p.emoji}</span>${p.animal}<button class="quitar" data-quitar="${id}" title="Quitar a ${p.animal}" aria-label="Quitar a ${p.animal}">✕</button></span>`).join("")
     : `<span class="vacio">Esperando que alguien se una…</span>`;
   const btn = document.getElementById("principal");
   if (btn) btn.textContent = ps.length ? `Empezar con ${ps.length} jugando` : "Empezar";
 }
+
+// en el lobby se puede quitar a un jugador que sobra (por ejemplo, un celular que entró dos veces)
+async function quitarJugador(id) {
+  const p = players[id];
+  if (!p || juego.estado !== "lobby") return;
+  if (!confirm(`¿Quitar a ${p.animal}? Su personaje queda libre.`)) return;
+  const tomados = (await db.get(ruta("tomados"))) || {};
+  await db.remove(ruta(`players/${id}`));
+  for (const k of Object.keys(tomados)) if (tomados[k] === id) await db.remove(ruta(`tomados/${k}`));
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-quitar]");
+  if (b) quitarJugador(b.dataset.quitar);
+});
 
 function etiqueta(q) {
   const r = PREGUNTAS[q].ronda;

@@ -162,6 +162,8 @@ button { font: inherit; color: inherit; }
 .animales { display: flex; flex-wrap: wrap; gap: .9vw; min-height: 6vw; align-content: flex-start; }
 .animales .chip { font-size: clamp(16px, 2vw, 30px); animation: pop .4s var(--ease); }
 .animales .chip .emo { font-size: 1.2em; }
+.quitar { border: 0; background: transparent; color: var(--text-muted); font: inherit; font-size: .7em; cursor: pointer; padding: 2px 4px; margin-left: 2px; border-radius: 50%; opacity: .5; }
+.quitar:hover { opacity: 1; color: var(--bad, #c0392b); }
 .vacio { color: var(--text-muted); font-size: clamp(16px, 1.8vw, 26px); }
 .acciones { display: flex; align-items: center; gap: 1.4vw; flex-wrap: wrap; margin-top: 1.4vw; }
 .acciones .btn { font-size: clamp(16px, 1.8vw, 26px); padding: 1vw 2.4vw; }
