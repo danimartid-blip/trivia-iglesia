@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e7c6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Programa">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>html, body { margin: 0; } html { -webkit-text-size-adjust: 100%; }</style>
+<title>Programa Día Evangélico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Concepto: hoja de programa de iglesia, una columna angosta con la hora como protagonista.
+   Mismo verde azulado de la app de trivia para que todo se sienta de la misma casa. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --ink: #15262b;
+  --muted: #566a70;
+  --line: #d6e0de;
+  --accent: #0e7c6b;
+  --accent-ink: #ffffff;
+  --accent-soft: #dff1ec;
+  --warn: #a3262a;
+  --warn-soft: #f8e3e1;
+  --f-display: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1a1c; --surface: #152427; --ink: #e6f0ee; --muted: #9db3af; --line: #2a4240;
+    --accent: #46c9ab; --accent-ink: #06211b; --accent-soft: #17352f; --warn: #ff9a92; --warn-soft: #3a1f1f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1a1c; --surface: #152427; --ink: #e6f0ee; --muted: #9db3af; --line: #2a4240;
+  --accent: #46c9ab; --accent-ink: #06211b; --accent-soft: #17352f; --warn: #ff9a92; --warn-soft: #3a1f1f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 calc(96px + env(safe-area-inset-bottom, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 760px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+
+.encabezado { padding-top: 22px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; justify-content: space-between; }
+.encabezado > div { min-width: 0; }
+.encabezado h1 { font-size: 26px; margin-top: 4px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.estado { font-size: 13px; color: var(--muted); }
+nav.bottom {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: var(--surface); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+nav.bottom .in { max-width: 760px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); }
+nav.bottom button {
+  appearance: none; background: none; border: 0; color: var(--muted); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 2px 8px;
+  font: 600 11px var(--f-body); min-width: 0;
+}
+nav.bottom svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+nav.bottom button[aria-selected="true"] { color: var(--accent); }
+nav.bottom button[aria-selected="true"] svg { stroke-width: 2.2; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+.panel { padding-top: 26px; display: grid; gap: 26px; }
+.panel[hidden] { display: none; }
+.lead { color: var(--muted); max-width: 62ch; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn {
+  appearance: none; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+  font: 600 14px var(--f-body); padding: 9px 14px; border-radius: 8px; cursor: pointer;
+}
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:active { transform: translateY(1px); }
+.status { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+/* Programa */
+.hora-ini { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
+input[type="time"], input[type="text"], input[type="number"], select, textarea {
+  font: 400 16px var(--f-body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; max-width: 100%;
+}
+textarea { width: 100%; resize: vertical; min-height: 84px; line-height: 1.5; }
+input[type="number"] { width: 5rem; }
+.prog { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.prog li { display: grid; grid-template-columns: 4.6rem 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.hora { font: 700 24px var(--f-display); font-variant-numeric: tabular-nums; color: var(--accent); line-height: 1.1; }
+.prog h3 { font-size: 18px; }
+.meta { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.nota { font-size: 15px; margin-top: 6px; max-width: 60ch; }
+.prog li.fin .hora { color: var(--muted); }
+.checks { display: grid; gap: 4px; }
+.check { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; cursor: pointer; }
+.check input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.check.hecho span { color: var(--muted); text-decoration: line-through; }
+h2.sec { font-size: 20px; }
+
+/* Reflexión */
+.apertura { display: grid; gap: 10px; }
+.cita { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.cita .tag { margin-bottom: 4px; }
+.tag { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; color: var(--accent); }
+.hilos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.hilos button {
+  text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  font: 600 15px var(--f-body); color: var(--ink); cursor: pointer; line-height: 1.3;
+}
+.hilos button small { display: block; font-weight: 400; color: var(--muted); margin-top: 3px; font-size: 13px; }
+.hilos button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+.hilo-det { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 18px; display: grid; gap: 18px; }
+.hilo-det h2 { font-size: 24px; }
+.kv { display: grid; gap: 2px; }
+.kv .k { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.pasos li { display: grid; grid-template-columns: 3.4rem 1fr; gap: 12px; }
+.pasos .min { font: 700 18px var(--f-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.pasos h4 { margin: 0 0 2px; font: 600 16px var(--f-body); }
+.puente { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; font-size: 17px; }
+.datos { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.aviso { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+
+/* Mensaje */
+.banner { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; font-size: 15px; }
+.form { display: grid; gap: 16px; }
+.campo { display: grid; gap: 6px; }
+.campo label, .campo .lab { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
+.punto { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
+.punto .cab { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+.punto .cab input[type="text"] { width: 100%; }
+.total { font-size: 14px; color: var(--muted); }
+.total.ok { color: var(--accent); font-weight: 600; }
+
+/* Papelitos y mensajes */
+.cards { display: grid; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; }
+.card-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; justify-content: space-between; }
+.card-head h3 { font-size: 18px; }
+.cuando { font-size: 13px; color: var(--muted); }
+pre.msg {
+  margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 15px/1.55 var(--f-body);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px;
+}
+.acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.enviado { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); cursor: pointer; margin-left: auto; }
+.enviado input { width: 17px; height: 17px; accent-color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: var(--accent-soft); color: var(--ink); border-radius: 999px; padding: 5px 12px; font-size: 14px; }
+.pasos-num { list-style: none; counter-reset: p; margin: 0; padding: 0; display: grid; gap: 14px; }
+.pasos-num li { counter-increment: p; display: grid; grid-template-columns: 2rem 1fr; gap: 10px; }
+.pasos-num li::before { content: counter(p); font: 700 20px var(--f-display); color: var(--accent); }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.card-head input[type="text"] { flex: 1 1 180px; font-weight: 600; }
+.chip-btn { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 5px 12px; font: 500 14px var(--f-body); cursor: pointer; }
+.chip-btn:hover { border-color: var(--accent); }
+.chip-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.enviados-h { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-left: auto; }
+.enviados-h .enviado { margin-left: 0; }
+.pie { color: var(--muted); font-size: 13px; text-align: center; padding-top: 8px; }
+.resumen { font-size: 14px; color: var(--accent); font-weight: 600; margin-top: 4px; }
+.lista { border-top: 1px solid var(--line); }
+.fila { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.fila .ck { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; min-width: 0; flex: 1; }
+.fila .ck input { margin-top: 4px; width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+.fila .ck small { display: block; color: var(--muted); font-size: 14px; }
+.fila.hecho strong, .fila.hecho small { text-decoration: line-through; color: var(--muted); }
+.fila .chip-btn { flex: none; font-size: 13px; }
+@media (max-width: 480px) {
+  header.top h1 { font-size: 24px; }
+  .prog li { grid-template-columns: 3.9rem 1fr; gap: 12px; }
+  .hora { font-size: 21px; }
+  .pasos li { grid-template-columns: 2.8rem 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+    <header class="encabezado">
+    <div>
+      <p class="eyebrow">Domingo 1 de noviembre · Día de las Iglesias Evangélicas</p>
+      <h1>Programa del día</h1>
+    </div>
+    <span class="estado" id="status">&nbsp;</span>
+  </header>
+
+  <main>
+    <!-- PROGRAMA -->
+    <section class="panel" id="tab-programa" role="tabpanel">
+      <label class="hora-ini">Hora de llegada
+        <input type="time" id="inicio" value="11:00">
+      </label>
+      <ol class="prog" id="prog"></ol>
+      <div class="card">
+        <div class="card-head"><h3>Para compartir con el Pastor, los músicos y Manuel</h3></div>
+        <div class="chips">
+          <button class="chip-btn" data-vista="equipo" aria-pressed="true">Versión del equipo</button>
+          <button class="chip-btn" data-vista="completa" aria-pressed="false">Con detalles</button>
+        </div>
+        <p class="cuando" id="desc-vista"></p>
+        <pre class="msg" id="pre-programa"></pre>
+        <div class="acc"><button class="btn" data-copy="programa">Copiar este texto</button></div>
+      </div>
+      <div>
+        <h2 class="sec">Para dejar listo</h2>
+        <div class="checks" id="checks"></div>
+      </div>
+    </section>
+
+    <!-- REFLEXIÓN -->
+    <section class="panel" id="tab-reflexion" role="tabpanel" hidden>
+      <p class="lead">La trivia termina con los sondeos y el resumen de ganadores. De ahí parte la reflexión de 8 minutos, que baja a un hilo y deja la frase puente lista para el mensaje.</p>
+      <div>
+        <h2 class="sec">Cómo arrancar desde el final de la trivia</h2>
+        <div class="apertura" id="aperturas" style="margin-top:12px"></div>
+      </div>
+      <div>
+        <h2 class="sec">Elige el hilo</h2>
+        <div class="hilos" id="hilos" style="margin-top:12px"></div>
+      </div>
+      <div class="hilo-det" id="hilo-det"></div>
+      <div>
+        <h2 class="sec">Datos para citar</h2>
+        <ul class="datos" id="datos" style="margin-top:12px"></ul>
+      </div>
+    </section>
+
+    <!-- MENSAJE -->
+    <section class="panel" id="tab-mensaje" role="tabpanel" hidden>
+      <div class="bar">
+        <p class="lead" style="flex:1 1 260px">Bosquejo del mensaje de hoy, 20 minutos. Se guarda solo.</p>
+        <button class="btn ghost" data-copy="bosquejo">Copiar bosquejo</button>
+      </div>
+      <div class="banner" id="banner-hilo"></div>
+      <div class="form" id="form-msg"></div>
+    </section>
+
+    <!-- PAPELITOS -->
+    <section class="panel" id="tab-papelitos" role="tabpanel" hidden>
+      <p class="lead">Juego para la convivencia, al final de la reunión. Los papelitos se recogen mientras corre el video de la ofrenda y se leen en voz alta mientras la gente come.</p>
+
+      <div class="dos">
+        <div class="card"><div class="tag">Cuánto dura</div><p>Unos 2 minutos por papelito. Con 12 papelitos son 25 minutos, justo para la convivencia.</p></div>
+        <div class="card"><div class="tag">Qué se necesita</div><p>Papelitos del mismo tamaño, lápices, un recipiente, una hoja para anotar puntos y un premio simbólico, como un dulce.</p></div>
+      </div>
+
+      <div>
+        <h2 class="sec">Cómo se juega, paso a paso</h2>
+        <ol class="pasos-num" style="margin-top:14px">
+          <li><p><strong>En la entrada.</strong> Cada persona recibe un papelito y un lápiz. Escribe una curiosidad suya, sin nombre. Los niños dibujan algo o se lo dicen al oído a un adulto, que lo escribe. Usa un papel de otro color para ellos.</p></li>
+          <li><p><strong>Se dobla y se guarda.</strong> Cada uno dobla el papelito en cuatro y lo deja en un recipiente. Un hermano lo recoge mientras corre el video de la ofrenda.</p></li>
+          <li><p><strong>Convivencia.</strong> Con la gente ya comiendo, tú sacas un papelito y lo lees en voz alta, sin dar pistas.</p></li>
+          <li><p><strong>Se adivina.</strong> Cada uno dice a quién cree que corresponde. Quien acierta suma un punto en la hoja.</p></li>
+          <li><p><strong>Se revela.</strong> Quien escribió la curiosidad levanta la mano, cuenta la historia en una frase y recibe un aplauso.</p></li>
+          <li><p><strong>Al final.</strong> Gana quien más puntos tenga. Si sobran papelitos, quedan para el café o para la próxima reunión.</p></li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Texto para el papelito</h3><button class="btn ghost" data-copy="papelito">Copiar</button></div>
+        <pre class="msg" id="pre-papelito"></pre>
+      </div>
+
+      <div>
+        <h2 class="sec">Ideas por si alguien se queda en blanco</h2>
+        <div class="chips" id="ideas" style="margin-top:12px"></div>
+      </div>
+
+      <div class="dos">
+        <div class="card">
+          <h3>Reglas para cuidar a todos</h3>
+          <ul class="datos">
+            <li>Que sea algo que a la persona le dé gusto contar. Nada que avergüence ni que toque heridas.</li>
+            <li>Sin nombre y sin pistas obvias en la letra. Mejor que escriban con mayúsculas.</li>
+            <li>Quien no quiera participar puede escribir su comida favorita de niño.</li>
+            <li>Tú revisas los papelitos antes de leerlos y dejas fuera los que no sirvan.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Otra forma, si el ambiente está movido</h3>
+          <p>Pega los papelitos numerados en una pared o mesa. Cada persona recibe una hoja y anota a quién cree que pertenece cada número. Al final se revelan todos juntos y gana quien más acertó. Sirve para jugar mientras se come y se conversa.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Cómo presentarlo</h3><button class="btn ghost" data-copy="presentar">Copiar</button></div>
+        <pre class="msg" id="pre-presentar"></pre>
+      </div>
+    </section>
+
+    <!-- COMPARTIR -->
+    <section class="panel" id="tab-compartir" role="tabpanel" hidden>
+      <div>
+        <h2 class="sec">Quién trae qué</h2>
+        <p class="lead" style="margin-top:6px">Lista interna. Marca a cada uno cuando confirme.</p>
+        <p class="resumen" id="resumen-lista"></p>
+      </div>
+      <div class="lista" id="lista"></div>
+      <div>
+        <h2 class="sec">Mensajes para enviar</h2>
+        <p class="lead" style="margin-top:6px">Sin nombres, uno por cada pedido. Primero la invitación y después el que corresponda.</p>
+      </div>
+      <div class="cards" id="msgs"></div>
+    </section>
+  </main>
+  <nav class="bottom" role="tablist" aria-label="Secciones"><div class="in">
+    <button role="tab" data-tab="programa" aria-selected="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Programa</button>
+    <button role="tab" data-tab="reflexion" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5C5 4 8 4 12 6c4-2 7-2 9-.5V19c-2-1.5-5-1.5-9 .5-4-2-7-2-9-.5z"/><path d="M12 6v13.5"/></svg>Reflexión</button>
+    <button role="tab" data-tab="mensaje" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Mensaje</button>
+    <button role="tab" data-tab="papelitos" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v12l-5 5H5z"/><path d="M14 21v-5h5"/></svg>Papelitos</button>
+    <button role="tab" data-tab="compartir" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h2a2 2 0 0 1 0 5h-2"/><path d="M8 3v3M12 3v3"/></svg>Compartir</button>
+  </div></nav>
+
+    <p class="pie">Se guarda en esta misma página. Lo nuevo del día se va sumando aquí.</p>
+</div>
+
+<script>
+/* ---------- datos ---------- */
+const PROGRAMA = [
+  { t: "Llegada y desayuno", quien: "Manuel y Vero", min: 20, nota: "La gente llega, se sirve algo liviano y recibe su papelito. La trivia queda abierta con el código QR en pantalla." },
+  { t: "Bienvenida, versículo y oración", quien: "Pastor", min: 7, nota: "Da la bienvenida, lee un versículo y ora." },
+  { t: "Dos alabanzas rápidas", quien: "Músicos", min: 10, nota: "La letra va en otra pestaña del computador. Al terminar se cambia el proyector a la trivia." },
+  { t: "Dinámica", quien: "Daniel", min: 25, nota: "10 de la Biblia, 10 de la Reforma y 5 sondeos. Entre rondas aparece el ganador y los personajes se barajan." },
+  { t: "Reflexión del Día de la Iglesia Evangélica", quien: "Daniel", min: 8, nota: "Parte desde el final de la trivia y termina con la frase puente hacia el mensaje." },
+  { t: "Mensaje", quien: "Daniel", min: 20, nota: "El bosquejo está en la pestaña Mensaje." },
+  { t: "Dos alabanzas lentas", quien: "Músicos", min: 10, nota: "" },
+  { t: "Video sobre la ofrenda", quien: "Multimedia", min: 3, nota: "Descargado en el computador, sin depender del internet. Mientras se ve, se recogen los papelitos." },
+  { t: "Ofrenda y avisos", quien: "Manuel", min: 7, nota: "Invita a ofrendar, ora y se queda adelante para dar los avisos de la iglesia." },
+  { t: "Cierre", quien: "Pastor", min: 8, nota: "Oración, peticiones y palabras finales. Invita a compartir con lo que trajo cada uno." },
+  { t: "Compartir", quien: "", min: 30, nota: "Comida y papelitos. Las reglas están en la pestaña Papelitos." },
+];
+
+const CHECKS = [
+  ["c1", "Enviar la invitación"],
+  ["c2", "Enviar a cada uno su pedido para el compartir"],
+  ["c9", "Confirmar con Manuel y Vero manteles, desayuno, té y café"],
+  ["c3", "Dejar el video de la ofrenda descargado en el computador"],
+  ["c4", "Tener la letra de las alabanzas en otra pestaña"],
+  ["c5", "Preparar papelitos, lápices y el recipiente"],
+  ["c6", "Abrir la trivia y tocar “Partida nueva”"],
+  ["c7", "Probar el código QR con un celular"],
+  ["c8", "Dejar el QR en pantalla desde la llegada de la gente"],
+];
+
+const APERTURAS = [
+  ["Desde los sondeos", "Nos reímos de cómo somos: de quien mira la hora cuando dicen “ya termino”, de quien canta con más entusiasmo que afinación, de quien ya está pensando en la once. Así somos. Y esta gente real, con sus manías, es la iglesia que hoy celebramos."],
+  ["Desde la respuesta sin respuesta mala", "En esta última ronda nadie tuvo una respuesta equivocada. Eso se parece a la iglesia: cabe el que canta bien, el que canta mal y el que solo mueve los labios. Pero no siempre hubo una iglesia a la que todos pudieran llegar así."],
+  ["Desde los ganadores", "Acaban de levantar la mano Sansón, Ester y compañía. Durante el juego todos tuvimos un nombre prestado. Ahora que sabemos quién era quién, hablemos de un nombre que no es prestado: el de un pueblo que Dios sigue formando."],
+];
+
+const HILOS = [
+  {
+    id: "gracia", nombre: "Por gracia, no por obras", corto: "El corazón de la Reforma",
+    idea: "La Reforma redescubrió que el perdón y la salvación no se compran ni se ganan: se reciben.",
+    texto: "Efesios 2:8-10 y Romanos 1:17",
+    trivia: "Indulgencias, Efesios 2:8-9 y las cinco solas",
+    pasos: [
+      [1, "Desde la risa", "En los sondeos confesamos cosas de la vida de iglesia: llegar, cantar, sentarse, traer algo a la once. Una pregunta en serio entre tanta risa: ¿hacemos todo eso para que Dios nos quiera, o porque ya nos quiere?"],
+      [3, "31 de octubre de 1517", "Un monje agustino, Martín Lutero, vivía angustiado tratando de ganarse el favor de Dios. En su tiempo se vendían indulgencias: papeles que prometían rebajar el castigo por los pecados a cambio de dinero. Estudiando la Biblia descubrió que “el justo por la fe vivirá” (Romanos 1:17) y escribió 95 tesis para conversarlo."],
+      [2, "De ahí venimos", "Esa idea cruzó el mundo, llegó a Chile y hoy tiene su propio día: desde 2008, cada 31 de octubre es el Día Nacional de las Iglesias Evangélicas y Protestantes."],
+      [2, "Lo que nos toca hoy", "La gracia no es permiso para vivir de cualquier manera. Efesios 2:10 sigue diciendo que fuimos creados para buenas obras. Primero recibimos, después vivimos."],
+    ],
+    puente: "Si ya lo recibimos todo por gracia, ¿cómo se ve una vida que responde a eso? De eso trata el mensaje de hoy.",
+    pregunta: "¿Vivo para ganarme el amor de Dios o vivo porque ya lo tengo?",
+  },
+  {
+    id: "biblia", nombre: "La Biblia en nuestras manos", corto: "Un precio que otros pagaron",
+    idea: "Alguien pagó un precio para que hoy podamos leer la Biblia en nuestro idioma.",
+    texto: "2 Timoteo 3:16-17 y Salmo 119:105",
+    trivia: "Lutero en alemán, la imprenta, la Reina-Valera y Sola Scriptura",
+    pasos: [
+      [1, "Desde la risa", "Hoy cualquiera de nosotros abre la Biblia en dos segundos, en papel o en el celular. Pregunta para partir: ¿cuánto vale algo que se consigue tan fácil?"],
+      [3, "Lo que costó", "Hasta la Reforma la Biblia circulaba en latín y casi nadie podía leerla. Lutero tradujo el Nuevo Testamento al alemán (1522) y la imprenta permitió que llegara a miles. En español, Casiodoro de Reina la tradujo en 1569 (la “Biblia del Oso”) y Cipriano de Valera la revisó en 1602: la Reina-Valera que muchos tienen en casa."],
+      [2, "Lo que hoy damos por hecho", "Hubo traductores perseguidos por poner la Palabra en el idioma de la gente. Lo que hoy tenemos a la mano fue conquistado."],
+      [2, "Lo que nos toca hoy", "Una Biblia cerrada no cambia a nadie. Sola Scriptura no es un lema para recordar, es una invitación a abrirla."],
+    ],
+    puente: "Si la Biblia está en nuestras manos, ¿qué nos dice? Eso es lo que vamos a mirar en el mensaje.",
+    pregunta: "¿Cuándo fue la última vez que abrí la Biblia sin que nadie me lo pidiera?",
+  },
+  {
+    id: "reformada", nombre: "Una iglesia que sigue cambiando", corto: "Reforma no es solo historia",
+    idea: "La Reforma no es un recuerdo del pasado: la iglesia y cada creyente siguen siendo transformados.",
+    texto: "Romanos 12:1-2",
+    trivia: "Valparaíso 1909, el feriado de 2008 y lo que significa “reforma”",
+    pasos: [
+      [1, "Desde la risa", "Nos reímos de nuestras costumbres. Algunas son lindas y otras son solo costumbre. La Reforma se atrevió a preguntar: ¿esto viene de la Biblia o de la tradición?"],
+      [3, "Volver a lo esencial", "Lutero no quería partir una iglesia, quería volver a lo esencial. Siglos después, en Valparaíso (1909), un avivamiento con el pastor Willis Hoover mostró que Dios sigue obrando y que la iglesia en Chile sigue creciendo."],
+      [2, "Siempre en reforma", "Los reformadores decían que la iglesia necesita volver una y otra vez a la Palabra. Lo mismo vale para cada persona."],
+      [2, "Lo que nos toca hoy", "Romanos 12:2: no se conformen a este siglo, sino transfórmense por la renovación de su mente. El cambio no es una vez en la vida, es un camino."],
+    ],
+    puente: "¿Qué parte de mi vida necesita ser renovada? Vamos al mensaje.",
+    pregunta: "¿Qué hay en mi vida que sigo haciendo solo por costumbre?",
+  },
+  {
+    id: "sacerdotes", nombre: "Todos somos sacerdotes", corto: "Nadie sobra en la iglesia",
+    idea: "Todo creyente tiene acceso directo a Dios y un lugar en el servicio de la iglesia.",
+    texto: "1 Pedro 2:9-10",
+    trivia: "Sacerdocio de todos los creyentes (pregunta 78), la Biblia en el idioma de la gente y el compartir de hoy",
+    pasos: [
+      [1, "Desde la risa", "En los sondeos nadie quedó expuesto, pero todos aportamos una respuesta. Eso es la iglesia: un cuerpo donde cada uno cuenta."],
+      [3, "Un acceso sin intermediarios", "Antes de la Reforma, solo el clero se acercaba a Dios por los demás. Lutero enseñó el sacerdocio de todos los creyentes: cada cristiano puede orar, leer la Biblia y servir. No quiere decir que todos seamos pastores. Quiere decir que nadie sobra."],
+      [2, "La mesa de hoy", "Por eso una iglesia tiene música, niños, cocina, oración y avisos. Cada uno pone algo en la mesa, como lo haremos hoy al compartir."],
+      [2, "Lo que nos toca hoy", "1 Pedro 2:9 nos llama linaje escogido y real sacerdocio. No es un título para unos pocos, es una responsabilidad compartida."],
+    ],
+    puente: "Si todos somos parte, ¿cómo servimos? Eso es lo que quiero compartir en el mensaje.",
+    pregunta: "¿Qué estoy aportando yo a esta familia?",
+  },
+];
+
+const DATOS = [
+  "31 de octubre de 1517: Lutero publica sus 95 tesis en Wittenberg, Alemania. Una tradición dice que las clavó en la puerta de la iglesia del castillo.",
+  "Martín Lutero (1483-1546) era monje agustino y profesor de teología.",
+  "1521: Lutero se niega a retractarse en la Dieta de Worms. Después se esconde en el castillo de Wartburg y traduce el Nuevo Testamento al alemán (1522).",
+  "Las cinco solas: solo la Escritura, solo la fe, solo la gracia, solo Cristo y solo a Dios la gloria.",
+  "1569: Casiodoro de Reina publica la Biblia del Oso. 1602: Cipriano de Valera la revisa. De ahí viene la Reina-Valera.",
+  "2008: la Ley 20.299 crea el Día Nacional de las Iglesias Evangélicas y Protestantes, el 31 de octubre.",
+  "1909: avivamiento en Valparaíso con el pastor Willis Hoover. Por confirmar el año exacto en que nace la Iglesia Metodista Pentecostal (1910) antes de decirlo en público.",
+  "Este año el 31 de octubre cae sábado, por eso lo celebramos el domingo 1 de noviembre.",
+];
+
+const MSG_FIELDS = [
+  { k: "titulo", label: "Título del mensaje", tipo: "input" },
+  { k: "texto", label: "Texto base", tipo: "input", ph: "Ej. Efesios 2:8-10" },
+  { k: "idea", label: "Idea central, en una frase", tipo: "area" },
+  { k: "intro", label: "Entrada, cómo parte desde la reflexión", tipo: "area" },
+  { k: "p1", label: "Punto 1", tipo: "punto" },
+  { k: "p2", label: "Punto 2", tipo: "punto" },
+  { k: "p3", label: "Punto 3", tipo: "punto" },
+  { k: "aplicacion", label: "Aplicación, qué hacemos esta semana", tipo: "area" },
+  { k: "pregunta", label: "Pregunta para llevarse", tipo: "input" },
+  { k: "cierre", label: "Cierre y oración", tipo: "area" },
+  { k: "notas", label: "Notas y citas para tener a mano", tipo: "area" },
+];
+
+const IDEAS = [
+  "Un lugar donde viví", "Un trabajo raro que tuve", "Mi comida favorita de niño", "Algo que me da miedo",
+  "Un talento escondido", "Un viaje que no olvido", "Mi primer sueldo", "Una mascota que tuve",
+  "Algo que colecciono", "Una anécdota de mi infancia", "Un apodo que me pusieron", "Una canción que me sé completa",
+];
+
+const TXT_PAPELITO = "Escribe una curiosidad tuya que casi nadie sepa.\nNo pongas tu nombre.\nQue sea algo que te dé risa contar.\n\nEjemplo: “De niño me escapé de la casa para ver el mar.”";
+const TXT_PRESENTAR = "Cuando llegaron, cada uno escribió una curiosidad suya sin poner el nombre. Ahora vamos a leerlas de una en una. Escuchen, miren a su alrededor y digan a quién creen que le pertenece. Quien acierte suma un punto. Y quien la escribió, cuando se revele, nos cuenta la historia en una frase. Hoy venimos a conocernos mejor, así que cuiden lo que digan y celebren lo que escuchen.";
+
+const pedir = (x) =>
+  `Bueno, por lo mismo quería ver la posibilidad de contar con una colaboración para el compartir. Para organizar y no repetirnos cosas, quería ver si pueden traer ${x}, lo que puedan. Lo ideal es que venga todo listo para compartir, con su plato, bandeja o fuente para ponerlo directo en la mesa. Y si no pueden se entiende, ¡pero no por ello falten! ¡Bendiciones! 🙏`;
+
+const MSGS = [
+  { id: "invitacion", t: "Invitación", para: "Todos", txt:
+`¡Bendiciones, hermanos! 🙌
+Este domingo 1 de noviembre celebramos el Día de las Iglesias Evangélicas y Protestantes con una reunión algo distinta. Partimos a las 11:00 hrs y terminaremos con un compartir entre los hermanos.
+¡Los esperamos! 🙏` },
+  { id: "dulce", t: "Algo dulce", para: "Beto y Vicky", txt: pedir("algo dulce como quequito, pie o kuchen") },
+  { id: "snack", t: "Snack salado en bolsas", para: "Pastores principales", txt: pedir("un snack salado en bolsas, como papas fritas o algo parecido") },
+  { id: "salado", t: "Algo salado", para: "Claudio y Johanna", txt: pedir("algo salado como empanadas, sándwiches o una tortilla") },
+  { id: "picoteo", t: "Para picar", para: "Carmen y Manuel", txt: pedir("queso en cuadritos, aceitunas y maní, o algo parecido para picar") },
+  { id: "yogurt", t: "Yogurt con cereal", para: "Rosita", txt: pedir("yogurt con cereal en vasitos individuales, unos 10 más o menos, o algo parecido") },
+  { id: "saludable", t: "Algo saludable", para: "Miguel y Tamara", txt: pedir("algo saludable, como frutas picadas") },
+  { id: "ayuda", t: "Ayuda con la mesa y el desayuno", para: "Manuel y Vero", txt:
+`Bueno, por lo mismo quería pedirles una ayudita para el domingo, si es que se puede 🙏 ¿Podrían llevar unos manteles para las mesas y ayudarnos a dejar ordenadas las cositas del compartir? Si pueden, también separar un poquito para un desayuno liviano al comienzo, y dejar lo demás para el final de la reunión. Y si se animan, ¿se encargarían del té, el cafecito y el agua caliente? Eso sería todo lo que les pedimos. ¡Muchas gracias, Dios los bendiga! 🙏` },
+  { id: "r1", t: "Recordatorio", para: "Todos, el sábado en la noche o el domingo temprano", txt:
+`Hola hermanos, les recuerdo que mañana domingo a las 11:00 hrs nos reunimos para celebrar el Día de las Iglesias Evangélicas. 🙌
+Los esperamos 🙏` },
+  { id: "r2", t: "Agradecimiento", para: "Todos, el domingo en la tarde", txt:
+`Gracias a todos por venir y por lo que trajeron, quedó todo riquísimo. Fue muy lindo celebrar juntos el Día de las Iglesias Evangélicas. Dios los bendiga 🙏` },
+];
+
+const LISTA = [
+  ["beto", "Beto y Vicky", "Algo dulce", "dulce"],
+  ["pastores", "Pastores principales", "Snack salado en bolsas, como papas fritas", "snack"],
+  ["claudio", "Claudio y Johanna", "Algo salado", "salado"],
+  ["yo", "Yo", "Bebidas", null],
+  ["carmen", "Carmen y Manuel", "Queso en cuadritos, aceitunas y maní, o algo parecido", "picoteo"],
+  ["rosita", "Rosita", "Si puede, yogurt con cereal en vasitos individuales, unos 10, o algo parecido", "yogurt"],
+  ["miguel", "Miguel y Tamara", "Algo saludable, como frutas picadas", "saludable"],
+  ["manuelvero", "Manuel y Vero", "Ordenar, manteles para las mesas, separar algo para el desayuno, té, café y agua caliente. Sin colaboración de comida", "ayuda"],
+];
+
+/* ---------- estado y guardado ---------- */
+const state = { llegada: "11:00", hilo: "", checks: {}, enviados: {}, conf: {}, msg: {} };
+let vistaProg = "equipo";
+let ref = null, timer = null, writing = false, pendiente = false, sucio = false, vistaHilo = null;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function setStatus(t) { const el = $("#status"); if (el) el.textContent = t || " "; }
+function guardar() { sucio = true; clearTimeout(timer); setStatus("Guardando…"); timer = setTimeout(vaciar, 600); }
+async function vaciar() {
+  if (writing) { pendiente = true; return; }
+  writing = true; sucio = false;
+  const copia = JSON.parse(JSON.stringify(state));
+  try {
+    try { localStorage.setItem("dia-evangelico", JSON.stringify(copia)); } catch (e) {}
+    if (ref) await ref.set(copia);
+    setStatus(ref ? "Guardado" : "Guardado solo en este navegador");
+  } catch (e) {
+    setStatus("No se pudo guardar. Intenta de nuevo.");
+  }
+  writing = false;
+  if (pendiente) { pendiente = false; vaciar(); }
+}
+
+/* ---------- utilidades ---------- */
+function horas() {
+  const [h, m] = (state.llegada || "11:00").split(":").map(Number);
+  let acum = h * 60 + m; const out = [];
+  PROGRAMA.forEach((p) => { out.push(fmt(acum)); acum += p.min; });
+  out.push(fmt(acum));
+  return out;
+}
+const fmt = (min) => String(Math.floor(min / 60) % 24).padStart(2, "0") + ":" + String(min % 60).padStart(2, "0");
+
+function textoPrograma(corto) {
+  const h = horas();
+  let t = "*Programa · Día de las Iglesias Evangélicas y Protestantes*\nDomingo 1 de noviembre\n\n";
+  PROGRAMA.forEach((p, i) => {
+    if (corto) t += `*${h[i]}* ${p.t}${p.quien ? ` (${p.quien})` : ""}\n`;
+    else t += `*${h[i]}* ${p.t}\n${p.quien ? p.quien + " · " : ""}${p.min} min${p.nota ? "\n" + p.nota : ""}\n\n`;
+  });
+  t += (corto ? "\n" : "") + `Fin estimado: ${h[PROGRAMA.length]}`;
+  return t;
+}
+function hiloActual() { return HILOS.find((h) => h.id === state.hilo) || null; }
+function textoBosquejo() {
+  const m = state.msg || {}; const h = hiloActual();
+  const L = [];
+  L.push(`MENSAJE: ${m.titulo || "(sin título)"}`);
+  if (m.texto) L.push(`Texto base: ${m.texto}`);
+  if (h) L.push(`Hilo conductor: ${h.nombre}\nPuente: ${h.puente}`);
+  if (m.idea) L.push(`Idea central: ${m.idea}`);
+  if (m.intro) L.push(`Entrada: ${m.intro}`);
+  ["p1", "p2", "p3"].forEach((k, i) => {
+    const p = m[k] || {};
+    if (p.titulo || p.texto) L.push(`${i + 1}. ${p.titulo || ""}${p.min ? " (" + p.min + " min)" : ""}\n${p.texto || ""}`);
+  });
+  if (m.aplicacion) L.push(`Aplicación: ${m.aplicacion}`);
+  if (m.pregunta) L.push(`Pregunta para llevarse: ${m.pregunta}`);
+  if (m.cierre) L.push(`Cierre y oración: ${m.cierre}`);
+  if (m.notas) L.push(`Notas: ${m.notas}`);
+  return L.join("\n\n");
+}
+const COPIAS = {
+  programa: () => textoPrograma(vistaProg === "equipo"),
+  bosquejo: textoBosquejo,
+  papelito: () => TXT_PAPELITO,
+  presentar: () => TXT_PRESENTAR,
+};
+MSGS.forEach((m) => { COPIAS[m.id] = () => m.txt; });
+
+async function copiar(texto, btn, fuente) {
+  const original = btn.textContent;
+  const listo = (t) => { btn.textContent = t; setTimeout(() => { btn.textContent = original; }, 1800); };
+  try { await navigator.clipboard.writeText(texto); listo("Copiado"); return; } catch (e) {}
+  const ta = document.createElement("textarea");
+  ta.value = texto; ta.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+  document.body.appendChild(ta); ta.select();
+  let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+  ta.remove();
+  if (ok) { listo("Copiado"); return; }
+  if (fuente) { const r = document.createRange(); r.selectNodeContents(fuente); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  listo("Seleccionado: copia con Ctrl+C");
+}
+
+/* ---------- render ---------- */
+function renderPrograma() {
+  const h = horas();
+  $("#prog").innerHTML = PROGRAMA.map((p, i) => `
+    <li><div class="hora">${h[i]}</div>
+      <div><h3>${esc(p.t)}</h3><p class="meta">${p.quien ? esc(p.quien) + " · " : ""}${p.min} min</p>${p.nota ? `<p class="nota">${esc(p.nota)}</p>` : ""}</div></li>`).join("")
+    + `<li class="fin"><div class="hora">${h[PROGRAMA.length]}</div><div><h3>Fin estimado</h3></div></li>`;
+  $("#inicio").value = state.llegada;
+  $("#pre-programa").textContent = textoPrograma(vistaProg === "equipo");
+  $$("[data-vista]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.vista === vistaProg)));
+  $("#desc-vista").textContent = vistaProg === "equipo"
+    ? "Solo la hora, qué pasa y quién lo hace. Esto es lo que se copia."
+    : "Suma la duración de cada parte y una nota con los detalles. Esto es lo que se copia.";
+  $("#checks").innerHTML = CHECKS.map(([id, t]) => `
+    <label class="check ${state.checks[id] ? "hecho" : ""}"><input type="checkbox" data-check="${id}" ${state.checks[id] ? "checked" : ""}><span>${esc(t)}</span></label>`).join("");
+}
+
+function renderReflexion() {
+  $("#aperturas").innerHTML = APERTURAS.map(([t, x], i) => `
+    <div class="cita"><div class="tag">${esc(t)}</div><p>${esc(x)}</p>
+    <div class="acc" style="margin-top:10px"><button class="btn ghost" data-copytxt="ap${i}">Copiar</button></div></div>`).join("");
+  $("#hilos").innerHTML = HILOS.map((h) => `
+    <button data-hilo="${h.id}" aria-pressed="${vistaHilo === h.id}">${esc(h.nombre)}<small>${esc(h.corto)}</small></button>`).join("");
+  const h = HILOS.find((x) => x.id === vistaHilo) || HILOS[0];
+  const elegido = state.hilo === h.id;
+  $("#hilo-det").innerHTML = `
+    <div><div class="tag">${elegido ? "Hilo elegido" : "Vista previa"}</div><h2>${esc(h.nombre)}</h2></div>
+    <div class="kv"><span class="k">Idea central</span><p>${esc(h.idea)}</p></div>
+    <div class="kv"><span class="k">Texto base</span><p>${esc(h.texto)}</p></div>
+    <div class="kv"><span class="k">Preguntas de la trivia que lo sembraron</span><p>${esc(h.trivia)}</p></div>
+    <ol class="pasos">${h.pasos.map(([m, t, x]) => `<li><div class="min">${m} min</div><div><h4>${esc(t)}</h4><p>${esc(x)}</p></div></li>`).join("")}</ol>
+    <div class="kv"><span class="k">Frase puente hacia el mensaje</span><p class="puente">${esc(h.puente)}</p></div>
+    <div class="kv"><span class="k">Pregunta para dejar pensando</span><p>${esc(h.pregunta)}</p></div>
+    <div class="acc">
+      <button class="btn" data-usar="${h.id}" ${elegido ? "disabled" : ""}>${elegido ? "Este es el hilo del día" : "Usar este hilo"}</button>
+      <button class="btn ghost" data-copytxt="hilo">Copiar reflexión</button>
+    </div>`;
+  $("#datos").innerHTML = DATOS.map((d) => `<li>${esc(d)}</li>`).join("");
+}
+function textoHilo(h) {
+  return `REFLEXIÓN · ${h.nombre}\nIdea central: ${h.idea}\nTexto base: ${h.texto}\n\n` +
+    h.pasos.map(([m, t, x]) => `${t} (${m} min)\n${x}`).join("\n\n") +
+    `\n\nFrase puente: ${h.puente}\nPregunta para dejar pensando: ${h.pregunta}`;
+}
+
+function construirFormulario() {
+  $("#form-msg").innerHTML = MSG_FIELDS.map((f) => {
+    if (f.tipo === "input") return `<div class="campo"><label for="m-${f.k}">${f.label}</label><input type="text" id="m-${f.k}" data-mk="${f.k}" ${f.ph ? `placeholder="${esc(f.ph)}"` : ""} autocomplete="off"></div>`;
+    if (f.tipo === "area") return `<div class="campo"><label for="m-${f.k}">${f.label}</label><textarea id="m-${f.k}" data-mk="${f.k}"></textarea></div>`;
+    return `<div class="punto"><div class="cab"><div class="campo"><label for="m-${f.k}-t">${f.label}</label><input type="text" id="m-${f.k}-t" data-mp="${f.k}" data-f="titulo" autocomplete="off"></div>
+      <div class="campo"><label for="m-${f.k}-m">Min</label><input type="number" id="m-${f.k}-m" min="0" max="30" data-mp="${f.k}" data-f="min"></div></div>
+      <div class="campo"><label for="m-${f.k}-x" class="lab">Desarrollo, ilustración y versículos</label><textarea id="m-${f.k}-x" data-mp="${f.k}" data-f="texto"></textarea></div></div>`;
+  }).join("") + `<p class="total" id="total-min"></p>`;
+}
+function rellenarFormulario() {
+  const m = state.msg || {};
+  const activo = document.activeElement;
+  $$("[data-mk]").forEach((el) => { if (el !== activo) el.value = m[el.dataset.mk] || ""; });
+  $$("[data-mp]").forEach((el) => { if (el !== activo) el.value = ((m[el.dataset.mp] || {})[el.dataset.f]) ?? ""; });
+  totalMinutos();
+}
+function totalMinutos() {
+  const m = state.msg || {};
+  const t = ["p1", "p2", "p3"].reduce((a, k) => a + (Number((m[k] || {}).min) || 0), 0);
+  const el = $("#total-min"); if (!el) return;
+  el.textContent = t ? `Suman ${t} min en los tres puntos, de 20 min disponibles.` : "Anota los minutos de cada punto para ver cuánto suman, de 20 min disponibles.";
+  el.className = "total" + (t && t <= 20 ? " ok" : "");
+}
+function renderBanner() {
+  const h = hiloActual();
+  $("#banner-hilo").innerHTML = h
+    ? `<strong>Hilo del día: ${esc(h.nombre)}.</strong> Tu frase puente es: “${esc(h.puente)}” Empieza el mensaje desde ahí.`
+    : `Todavía no eliges el hilo de la reflexión. Ve a la pestaña Reflexión, toca “Usar este hilo” y tu frase puente aparece aquí.`;
+}
+
+function renderCompartir() {
+  $("#lista").innerHTML = LISTA.map(([id, n, t, m]) => `
+    <div class="fila ${state.conf[id] ? "hecho" : ""}">
+      <label class="ck"><input type="checkbox" data-conf="${id}" ${state.conf[id] ? "checked" : ""}><span><strong>${esc(n)}</strong><small>${esc(t)}</small></span></label>
+      ${m ? `<button class="chip-btn" data-copy="${m}">Copiar mensaje</button>` : ""}
+    </div>`).join("");
+  resumenLista();
+  $("#msgs").innerHTML = MSGS.map((m) => `
+    <div class="card"><div class="card-head"><h3>${esc(m.t)}</h3><span class="cuando">Para: ${esc(m.para)}</span></div>
+      <pre class="msg" id="pre-${m.id}">${esc(m.txt)}</pre>
+      <div class="acc"><button class="btn" data-copy="${m.id}">Copiar</button>
+      <label class="enviado"><input type="checkbox" data-env="${m.id}" ${state.enviados[m.id] ? "checked" : ""}>Enviado</label></div></div>`).join("");
+}
+function resumenLista() {
+  const total = LISTA.length, ok = LISTA.filter(([id]) => state.conf[id]).length;
+  $("#resumen-lista").textContent = `${ok} de ${total} confirmados`;
+}
+function renderPapelitos() {
+  $("#pre-papelito").textContent = TXT_PAPELITO;
+  $("#pre-presentar").textContent = TXT_PRESENTAR;
+  $("#ideas").innerHTML = IDEAS.map((i) => `<span class="chip">${esc(i)}</span>`).join("");
+}
+function renderTodo() { renderPrograma(); renderReflexion(); rellenarFormulario(); renderBanner(); renderCompartir(); }
+
+/* ---------- eventos ---------- */
+document.addEventListener("click", (e) => {
+  const c = e.target.closest("[data-copy]");
+  if (c) { const id = c.dataset.copy; const f = document.getElementById("pre-" + id); copiar(COPIAS[id](), c, f); return; }
+  const ct = e.target.closest("[data-copytxt]");
+  if (ct) {
+    const k = ct.dataset.copytxt;
+    const t = k === "hilo" ? textoHilo(HILOS.find((x) => x.id === vistaHilo) || HILOS[0]) : APERTURAS[Number(k.slice(2))][1];
+    copiar(t, ct); return;
+  }
+  const vp = e.target.closest("[data-vista]");
+  if (vp) { vistaProg = vp.dataset.vista; renderPrograma(); return; }
+  const h = e.target.closest("[data-hilo]");
+  if (h) { vistaHilo = h.dataset.hilo; renderReflexion(); return; }
+  const u = e.target.closest("[data-usar]");
+  if (u) { state.hilo = u.dataset.usar; vistaHilo = state.hilo; renderReflexion(); renderBanner(); guardar(); return; }
+});
+document.addEventListener("change", (e) => {
+  const ck = e.target.closest("[data-check]"); if (ck) { state.checks[ck.dataset.check] = ck.checked; ck.closest(".check").classList.toggle("hecho", ck.checked); guardar(); return; }
+  const en = e.target.closest("[data-env]"); if (en) { state.enviados[en.dataset.env] = en.checked; guardar(); return; }
+  const cf = e.target.closest("[data-conf]");
+  if (cf) { state.conf[cf.dataset.conf] = cf.checked; cf.closest(".fila").classList.toggle("hecho", cf.checked); resumenLista(); guardar(); return; }
+  if (e.target.id === "inicio" && e.target.value) { state.llegada = e.target.value; renderPrograma(); guardar(); }
+});
+document.addEventListener("input", (e) => {
+  const t = e.target;
+  if (t.dataset.mk) { state.msg = state.msg || {}; state.msg[t.dataset.mk] = t.value; guardar(); return; }
+  if (t.dataset.mp) {
+    state.msg = state.msg || {}; const k = t.dataset.mp; state.msg[k] = state.msg[k] || {};
+    state.msg[k][t.dataset.f] = t.dataset.f === "min" ? (t.value === "" ? "" : Number(t.value)) : t.value;
+    totalMinutos(); guardar();
+  }
+});
+
+/* ---------- pestañas ---------- */
+const TABS = ["programa", "reflexion", "mensaje", "papelitos", "compartir"];
+function irA(tab, actualizarHash) {
+  if (!TABS.includes(tab)) tab = "programa";
+  TABS.forEach((t) => { $("#tab-" + t).hidden = t !== tab; });
+  $$("nav.bottom button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === tab)));
+  try { if (actualizarHash) history.replaceState(null, "", "#" + tab); } catch (e) {}
+  window.scrollTo(0, 0);
+}
+$("nav.bottom").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) irA(b.dataset.tab, true); });
+window.addEventListener("hashchange", () => irA(location.hash.slice(1), false));
+
+/* ---------- arranque ---------- */
+construirFormulario();
+renderPapelitos();
+try { const g = JSON.parse(localStorage.getItem("dia-evangelico") || "null"); if (g) Object.assign(state, g); } catch (e) {}
+vistaHilo = state.hilo || HILOS[0].id;
+renderTodo();
+irA(location.hash.slice(1), false);
+
+(async () => {
+  let db = null;
+  try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) {}
+  if (!db) { setStatus("Se guarda solo en este navegador"); return; }
+  ref = db.doc("app/datos");
+  ref.onSnapshot((snap) => {
+    if (snap.metadata && snap.metadata.hasPendingWrites) return;
+    const activo = document.activeElement;
+    const escribiendo = activo && /^(INPUT|TEXTAREA)$/.test(activo.tagName);
+    if (snap.exists) {
+      if (writing || pendiente || sucio || escribiendo) return;
+      const d = snap.data();
+      Object.assign(state, { llegada: "11:00", hilo: "", checks: {}, enviados: {}, conf: {}, msg: {} }, d);
+      vistaHilo = state.hilo || vistaHilo || HILOS[0].id;
+      renderTodo(); setStatus("Guardado");
+    } else {
+      vaciar();
+    }
+  }, () => { ref = null; setStatus("Se guarda solo en este navegador"); });
+})();
+
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); }); }
+</script>
+</body>
+</html>
