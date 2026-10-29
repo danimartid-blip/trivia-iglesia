@@ -275,7 +275,7 @@ function vistaRondaFin() {
     <p class="eyebrow">Ronda ${r + 1} · ${RONDAS[r].titulo}</p>
     <h1>${g ? (empate ? "¡Empate en la cima!" : `¡Gana ${g.animal} ${g.emoji}!`) : "Nadie sumó puntos esta ronda"}</h1>
     ${g ? `<div class="podio">${col(orden[1], 2)}${col(orden[0], 1)}${col(orden[2], 3)}</div>
-    <p class="vacio">Si eres ese personaje, levanta la mano… o quédate en secreto. 🤫</p>` : ""}
+    <p class="vacio">${empate ? "¡Los empatados ya pueden levantar la mano!" : `¡${g.animal}, ahora puedes levantar la mano!`} 🙌 Un aplauso para ${empate ? "ellos" : "tu personaje"} 👏</p>` : ""}
     <div class="acciones"><button class="btn" id="principal">${hay ? `Barajar personajes y seguir con la ronda ${r + 2}` : "Terminar"}</button></div>
   </div></div>`;
 }
@@ -335,7 +335,7 @@ function vistaFin() {
     <h1>¡Gracias por jugar!</h1>
     ${filas.length ? `<div class="recap">${filas.map(({ R, r, g }, i) => `<div class="fila" style="animation-delay:${i * 200}ms">
       <span class="rn">Ronda ${r + 1} · ${R.titulo}</span><span class="gan">${g.emoji} ${g.animal}</span><span class="pts">${g.puntos} pts</span></div>`).join("")}</div>
-    <p class="vacio">Si eras alguno de esos personajes, levanta la mano… o quédate en secreto. 🤫</p>` : ""}
+    <p class="vacio">¡Ahora sí! ${[...new Set(filas.map((x) => x.g.animal))].join(", ")}: levanten la mano y reciban su aplauso 🙌👏</p>` : ""}
     <div class="acciones"><button class="btn ghost" id="btnNueva">Partida nueva</button></div>
   </div></div>`;
 }

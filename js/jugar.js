@@ -170,7 +170,7 @@ function pintar() {
     html += `<div class="resultado"><div class="gigante">${n === 1 && hayPuntos ? "🏆" : "🙌"}</div>
       <h2>${n === 1 && hayPuntos ? "¡Ganaste la ronda!" : "Terminó la ronda"}</h2>
       ${hayPuntos ? `<p>Quedaste en el puesto <b>${n}</b> de ${de}. Solo tú ves esto.</p>` : ""}
-      ${n === 1 && hayPuntos ? `<p>Levanta la mano si quieres… o guárdalo en secreto 🤫</p>` : ""}
+      ${n === 1 && hayPuntos ? `<p>¡Ahora puedes levantar la mano, ${yo.animal}! 🙌</p>` : ""}
       <p>Mira la pantalla: viene un cambio de personaje.</p></div>`;
   } else if (juego.estado === "fin") {
     html += `<div class="resultado"><div class="gigante">🙌</div><h2>¡Gracias por jugar!</h2>
