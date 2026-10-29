@@ -141,18 +141,8 @@ export const RONDAS = [
     preguntas: [
       {
         tipo: "sondeo", segundos: 15,
-        texto: "¿En qué piensas cuando te distraes en la prédica?",
-        opciones: ["Que me pidan orar en voz alta", "Que me suene el celular", "Que pregunten “¿alguien quiere compartir?”"],
-      },
-      {
-        tipo: "sondeo", segundos: 15,
         texto: "¿Qué haces cuando el predicador dice “ya termino”?",
         opciones: ["Miro la hora", "Sé que faltan 20 minutos", "Me acomodo en la silla"],
-      },
-      {
-        tipo: "sondeo", segundos: 15,
-        texto: "¿Cómo cantas en el culto?",
-        opciones: ["Como un ángel", "Con entusiasmo y poca afinación", "Muevo los labios y confío en el de al lado"],
       },
       {
         tipo: "sondeo", segundos: 15,
@@ -161,8 +151,18 @@ export const RONDAS = [
       },
       {
         tipo: "sondeo", segundos: 15,
+        texto: "¿Qué haces cuando dicen “abran su Biblia en…”?",
+        opciones: ["La busco en el celular", "La saco, bien subrayada", "Espero que la proyecten"],
+      },
+      {
+        tipo: "sondeo", segundos: 15,
         texto: "¿Qué haces cuando ves al hermano de al lado durmiendo?",
         opciones: ["Al final del culto lo reprendo", "Toso o meto ruido", "Me guardo el recuerdo solamente"],
+      },
+      {
+        tipo: "sondeo", segundos: 15,
+        texto: "¿Cuál es tu técnica para no dormirte en la predicación?",
+        opciones: ["Tomo apuntes", "Cambio de posición cada cinco minutos", "Miro fijo al pastor y asiento con la cabeza"],
       },
       {
         tipo: "sondeo", segundos: 15,
@@ -182,7 +182,7 @@ export const RONDAS = [
       {
         tipo: "sondeo", segundos: 15,
         texto: "¿Qué haces con los mensajes del grupo de WhatsApp de la iglesia?",
-        opciones: ["Respondo con un pulgar arriba", "Silencio el grupo", "Leo todo y no escribo nada"],
+        opciones: ["Respondo con un pulgar arriba", "Ignoro :(", "Leo todo y no escribo nada"],
       },
       {
         tipo: "sondeo", segundos: 15,
