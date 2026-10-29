@@ -101,7 +101,7 @@ export const RONDAS = [
   },
   {
     titulo: "Sondeos para conocernos",
-    sub: "Aquí no hay respuesta mala. Solo risas.",
+    sub: "Aquí no hay respuesta mala. Solo sinceridad jeje.",
     preguntas: [
       {
         tipo: "sondeo", segundos: 15,
