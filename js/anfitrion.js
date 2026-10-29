@@ -242,6 +242,8 @@ function actualizarCuriosidades() {
 function abrirCuriosidades() {
   const textos = textosCuriosidades();
   if (!textos.length || document.getElementById("cur-overlay")) return;
+  const llegada = [...textos];
+  let lista = false;
   for (let i = textos.length - 1; i > 0; i--) {
     const k = Math.floor(Math.random() * (i + 1));
     [textos[i], textos[k]] = [textos[k], textos[i]];
@@ -258,18 +260,29 @@ function abrirCuriosidades() {
     else if (e.key === "ArrowLeft") ir(-1);
   };
   const pintarCur = () => {
+    if (lista) {
+      el.classList.add("lista");
+      el.innerHTML = `<p class="eyebrow">Todas las curiosidades (${llegada.length}) · en el orden en que llegaron</p>
+        <ol class="cur-lista">${llegada.map((t) => `<li>${esc(t)}</li>`).join("")}</ol>
+        <div class="acciones"><button class="btn" data-a="l">Volver a leer</button><button class="btn ghost" data-a="x">Cerrar</button></div>`;
+      return;
+    }
+    el.classList.remove("lista");
     el.innerHTML = `<p class="eyebrow">Curiosidad ${i + 1} de ${textos.length} · ¿De quién será?</p>
       <p class="cur-texto">${esc(textos[i])}</p>
       <div class="acciones">
         <button class="btn ghost" data-a="-1" ${i === 0 ? "disabled" : ""}>Anterior</button>
         <button class="btn" data-a="1" ${i === textos.length - 1 ? "disabled" : ""}>Siguiente</button>
+        <button class="btn ghost" data-a="l">Ver todas</button>
         <button class="btn ghost" data-a="x">Cerrar</button>
       </div>`;
   };
   el.addEventListener("click", (e) => {
     const b = e.target.closest("[data-a]");
     if (!b) return;
-    if (b.dataset.a === "x") cerrar(); else ir(Number(b.dataset.a));
+    if (b.dataset.a === "x") cerrar();
+    else if (b.dataset.a === "l") { lista = !lista; pintarCur(); }
+    else ir(Number(b.dataset.a));
   });
   addEventListener("keydown", tecla);
   document.body.appendChild(el);

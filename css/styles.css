@@ -247,3 +247,5 @@ button { font: inherit; color: inherit; }
 .cur-texto { font-size: clamp(28px, 4.6vw, 80px); font-weight: 800; line-height: 1.2; max-width: 22ch; max-width: 26em; text-wrap: balance; }
 
 [hidden] { display: none !important; }
+.cur-overlay.lista { justify-content: flex-start; padding-top: 4vw; overflow-y: auto; }
+.cur-lista { list-style: decimal inside; text-align: left; font-size: clamp(16px, 2vw, 30px); line-height: 1.4; max-width: 60em; display: flex; flex-direction: column; gap: .7em; }
