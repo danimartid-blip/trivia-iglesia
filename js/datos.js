@@ -5,7 +5,7 @@
 export const RONDAS = [
   {
     titulo: "La Biblia",
-    sub: "Siete preguntas para ver quién se sabe a sus personajes.",
+    sub: "Diez preguntas para ver quién se sabe a sus personajes.",
     preguntas: [
       {
         tipo: "trivia", segundos: 20, correcta: 1,
@@ -32,6 +32,18 @@ export const RONDAS = [
         dato: "La burra de Balaam habló para avisarle que había un ángel en el camino (Números 22).",
       },
       {
+        tipo: "trivia", segundos: 20, correcta: 0,
+        texto: "¿Quién se convirtió en estatua de sal por mirar atrás?",
+        opciones: ["La esposa de Lot", "Sara", "Agar"],
+        dato: "Fue la esposa de Lot, que miró atrás al huir de Sodoma (Génesis 19.26), a pesar de que les habían pedido no hacerlo.",
+      },
+      {
+        tipo: "trivia", segundos: 20, correcta: 1,
+        texto: "¿Qué comía Juan el Bautista en el desierto?",
+        opciones: ["Pan y pescado", "Langostas y miel silvestre", "Dátiles y leche"],
+        dato: "Juan el Bautista comía langostas y miel silvestre en el desierto, y se vestía con pelo de camello (Mateo 3.4).",
+      },
+      {
         tipo: "trivia", segundos: 20, correcta: 2,
         texto: "¿Quién se quedó dormido en plena predicación y se cayó por una ventana?",
         opciones: ["Jonás", "Silas", "Eutico"],
@@ -42,6 +54,12 @@ export const RONDAS = [
         texto: "¿Qué libro de la Biblia no menciona ni una vez el nombre de Dios?",
         opciones: ["Ester", "Rut", "Jonás"],
         dato: "Ester no nombra a Dios ni una vez, aunque su mano se nota en toda la historia.",
+      },
+      {
+        tipo: "trivia", segundos: 20, correcta: 0,
+        texto: "¿Cuál de estos NO es fruto del Espíritu (Gálatas 5)?",
+        opciones: ["Popularidad", "Dominio propio", "Mansedumbre"],
+        dato: "El fruto del Espíritu es amor, gozo, paz, paciencia, benignidad, bondad, fe, mansedumbre y dominio propio (Gálatas 5.22-23). La popularidad no está en la lista.",
       },
       {
         tipo: "trivia", segundos: 20, correcta: 1,
@@ -57,27 +75,21 @@ export const RONDAS = [
     preguntas: [
       {
         tipo: "trivia", segundos: 20, correcta: 1,
-        texto: "¿Desde qué año es feriado el 31 de octubre en Chile?",
-        opciones: ["1990", "2008", "2015"],
-        dato: "La Ley 20.299, de 2008, creó el Día Nacional de las Iglesias Evangélicas y Protestantes.",
-      },
-      {
-        tipo: "trivia", segundos: 15, correcta: 1,
         texto: "Lutero se hizo famoso por clavar 95… en una puerta.",
         opciones: ["Sopaipillas", "Tesis", "Memes"],
         dato: "Fueron 95 tesis, en 1517. Por eso se recuerda cada 31 de octubre.",
       },
       {
-        tipo: "trivia", segundos: 15, correcta: 2,
-        texto: "¿A qué idioma tradujo Lutero la Biblia?",
-        opciones: ["Latín", "Inglés", "Alemán"],
-        dato: "Lutero tradujo el Nuevo Testamento al alemán para que la gente común pudiera leerlo (1522).",
+        tipo: "trivia", segundos: 20, correcta: 2,
+        texto: "Lutero protestó con sus 95 tesis contra la venta de…",
+        opciones: ["Biblias en alemán", "Entradas a la catedral", "Indulgencias"],
+        dato: "Las indulgencias prometían rebajar el castigo por los pecados a cambio de dinero. Lutero dijo que el perdón no se compra: viene de Dios (1517).",
       },
       {
-        tipo: "trivia", segundos: 15, correcta: 0,
-        texto: "¿Qué invento ayudó a difundir las ideas de la Reforma?",
-        opciones: ["La imprenta", "La radio", "El telégrafo"],
-        dato: "La imprenta permitió reproducir Biblias y folletos como nunca antes.",
+        tipo: "trivia", segundos: 20, correcta: 1,
+        texto: "Según Efesios 2:8-9, ¿cómo somos salvos?",
+        opciones: ["Por nuestras buenas obras", "Por gracia, mediante la fe", "Por pertenecer a una iglesia"],
+        dato: "“Por gracia sois salvos por medio de la fe; y esto no de vosotros, pues es don de Dios”. Es la base de “sola gracia” y “sola fe”.",
       },
       {
         tipo: "trivia", segundos: 20, correcta: 1,
@@ -86,16 +98,40 @@ export const RONDAS = [
         dato: "Sola Scriptura: la Biblia es la autoridad final. Las otras “solas” son fe, gracia, Cristo y la gloria de Dios.",
       },
       {
+        tipo: "trivia", segundos: 20, correcta: 0,
+        texto: "¿Cuál de estas NO es una de las cinco “solas” de la Reforma?",
+        opciones: ["Sola Ecclesia (solo la Iglesia)", "Sola Gratia (solo la gracia)", "Soli Deo Gloria (solo a Dios la gloria)"],
+        dato: "Las cinco solas son: solo la Escritura, solo la fe, solo la gracia, solo Cristo y solo a Dios la gloria. “Sola Ecclesia” no existe.",
+      },
+      {
+        tipo: "trivia", segundos: 20, correcta: 2,
+        texto: "¿A qué idioma tradujo Lutero la Biblia?",
+        opciones: ["Latín", "Inglés", "Alemán"],
+        dato: "Lutero tradujo el Nuevo Testamento al alemán para que la gente común pudiera leerlo (1522).",
+      },
+      {
+        tipo: "trivia", segundos: 20, correcta: 0,
+        texto: "¿Qué invento ayudó a difundir las ideas de la Reforma?",
+        opciones: ["La imprenta", "La radio", "El telégrafo"],
+        dato: "La imprenta permitió reproducir Biblias y folletos como nunca antes.",
+      },
+      {
         tipo: "trivia", segundos: 20, correcta: 2,
         texto: "La Biblia “Reina-Valera” se llama así por…",
         opciones: ["Una reina de España", "Una ciudad llamada Valera", "Sus traductores, Reina y Valera"],
         dato: "Casiodoro de Reina la tradujo en 1569 (la “Biblia del Oso”) y Cipriano de Valera la revisó en 1602.",
       },
       {
-        tipo: "trivia", segundos: 20, correcta: 1,
+        tipo: "trivia", segundos: 25, correcta: 1,
         texto: "¿En qué ciudad partió el avivamiento pentecostal chileno en 1909, con el pastor Willis Hoover?",
         opciones: ["Santiago", "Valparaíso", "Concepción"],
         dato: "Fue en Valparaíso, en 1909, con el pastor Willis Hoover.",
+      },
+      {
+        tipo: "trivia", segundos: 20, correcta: 1,
+        texto: "¿Desde qué año es feriado el 31 de octubre en Chile?",
+        opciones: ["1990", "2008", "2015"],
+        dato: "La Ley 20.299, de 2008, creó el Día Nacional de las Iglesias Evangélicas y Protestantes.",
       },
     ],
   },
@@ -105,13 +141,13 @@ export const RONDAS = [
     preguntas: [
       {
         tipo: "sondeo", segundos: 15,
-        texto: "¿Qué haces cuando el predicador dice “ya termino”?",
-        opciones: ["Miro la hora", "Sé que faltan 20 minutos", "Aprovecho y pienso en la once"],
+        texto: "¿En qué piensas cuando te distraes en la prédica?",
+        opciones: ["Que me pidan orar en voz alta", "Que me suene el celular", "Que pregunten “¿alguien quiere compartir?”"],
       },
       {
         tipo: "sondeo", segundos: 15,
-        texto: "¿Cuál es tu peor pesadilla en el culto?",
-        opciones: ["Que me pidan orar en voz alta", "Que me suene el celular", "Que pregunten “¿alguien quiere compartir?”"],
+        texto: "¿Qué haces cuando el predicador dice “ya termino”?",
+        opciones: ["Miro la hora", "Sé que faltan 20 minutos", "Me acomodo en la silla"],
       },
       {
         tipo: "sondeo", segundos: 15,
@@ -120,23 +156,13 @@ export const RONDAS = [
       },
       {
         tipo: "sondeo", segundos: 15,
-        texto: "¿Dónde te sientas en el templo?",
-        opciones: ["Adelante, para ver todo", "En el medio", "Atrás, cerca de la puerta"],
+        texto: "¿Qué no puede faltar en el compartir de la iglesia?",
+        opciones: ["Su buen quequito", "Su buen café", "Su buen pancito"],
       },
       {
         tipo: "sondeo", segundos: 15,
-        texto: "¿Qué haces cuando dicen “abran su Biblia en…”?",
-        opciones: ["La busco en el celular", "La saco, bien subrayada", "Miro al de al lado"],
-      },
-      {
-        tipo: "sondeo", segundos: 15,
-        texto: "¿Qué no puede faltar en una once evangélica?",
-        opciones: ["Pan amasado", "Marraqueta con palta", "El kuchen de la hermana"],
-      },
-      {
-        tipo: "sondeo", segundos: 15,
-        texto: "¿Qué haces primero al llegar a una convivencia?",
-        opciones: ["Busco la mesa de comida", "Saludo a todos", "Me ofrezco a ayudar y me escapo"],
+        texto: "¿Qué haces cuando ves al hermano de al lado durmiendo?",
+        opciones: ["Al final del culto lo reprendo", "Toso o meto ruido", "Me guardo el recuerdo solamente"],
       },
     ],
   },
