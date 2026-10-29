@@ -308,6 +308,20 @@ function vistaPregunta() {
   </div>`;
 }
 
+function panelSondeo(P, conteos) {
+  const filas = P.opciones.map((o, i) => ({ o, i, c: conteos[i] || 0 })).sort((a, b) => b.c - a.c || a.i - b.i);
+  const total = filas.reduce((a, f) => a + f.c, 0);
+  if (!total) return `<h3>Lo que respondieron</h3><p class="vacio">Nadie votó esta vez.</p>`;
+  const max = filas[0].c, min = filas[filas.length - 1].c;
+  const marca = (c) => (max === min ? "" : c === max ? "Más elegida" : c === min ? "Menos elegida" : "");
+  return `<h3>Lo que respondieron</h3><div class="barras">${filas.map((f, k) => `
+    <div class="barra-fila ${max !== min && f.c === max ? "mas" : ""}" style="animation-delay:${k * 80}ms">
+      <div class="barra-top"><span class="barra-nombre"><span class="forma">${FORMAS[f.i]}</span> ${f.o}</span><span class="barra-num">${f.c} · ${Math.round((f.c / total) * 100)}%</span></div>
+      <div class="barra-pista"><span class="barra-relleno op-${f.i}" style="width:${Math.round((f.c / max) * 100)}%"></span></div>
+      ${marca(f.c) ? `<span class="barra-marca">${marca(f.c)}</span>` : ""}
+    </div>`).join("")}</div>`;
+}
+
 function vistaResultado() {
   const P = PREGUNTAS[juego.q];
   const r = res[juego.q] || { conteos: [], top: [] };
@@ -321,6 +335,11 @@ function vistaResultado() {
       <span class="conteo">${c}</span><span class="relleno" style="width:${Math.round((c / total) * 100)}%"></span></div>`;
   }).join("");
   const top = lista(r.top);
+  // en un sondeo no hay puntos: el panel muestra qué opción eligió más gente y cuál menos
+  const panel = trivia
+    ? `<h3>Los primeros</h3>
+        <ol>${top.length ? top.map((t, i) => `<li style="animation-delay:${i * 80}ms"><span class="n">${i + 1}</span><span>${t.emoji} ${t.animal}</span><span class="p">${t.puntos}</span></li>`).join("") : "<li>—</li>"}</ol>`
+    : panelSondeo(P, conteos);
   const finRonda = esFinDeRonda(juego.q);
   const rr = P.ronda;
   const textoBoton = !finRonda ? "Siguiente"
@@ -334,9 +353,7 @@ function vistaResultado() {
         <div class="tiles" style="--n:${P.opciones.length}">${cuerpo}</div>
         ${P.dato ? `<p class="dato">${P.dato}</p>` : ""}
       </div>
-      <div class="top"><h3>${trivia ? "Los primeros" : "Puntos hasta ahora"}</h3>
-        <ol>${top.length ? top.map((t, i) => `<li style="animation-delay:${i * 80}ms"><span class="n">${i + 1}</span><span>${t.emoji} ${t.animal}</span><span class="p">${t.puntos}</span></li>`).join("") : "<li>—</li>"}</ol>
-      </div>
+      <div class="top">${panel}</div>
     </div>
     <div class="acciones"><button class="btn" id="principal">${textoBoton}</button></div>
   </div>`;

@@ -192,6 +192,15 @@ button { font: inherit; color: inherit; }
 .top ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .7vw; }
 .top li { display: flex; align-items: center; gap: 1vw; font-size: clamp(16px, 2vw, 30px); font-weight: 700; animation: pop .4s var(--ease) both; }
 .top li .n { color: var(--text-muted); width: 1.4ch; font-variant-numeric: tabular-nums; }
+.barras { display: flex; flex-direction: column; gap: 1.1vw; }
+.barra-fila { display: flex; flex-direction: column; gap: .3vw; animation: pop .4s var(--ease) both; }
+.barra-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1vw; font-size: clamp(14px, 1.6vw, 24px); font-weight: 700; }
+.barra-nombre { min-width: 0; }
+.barra-num { font-variant-numeric: tabular-nums; color: var(--text-secondary); font-weight: 800; white-space: nowrap; }
+.barra-pista { height: clamp(10px, 1.1vw, 18px); background: var(--border); border-radius: 99px; overflow: hidden; }
+.barra-relleno { display: block; height: 100%; border-radius: 99px; transition: width .6s var(--ease); }
+.barra-marca { font-size: clamp(11px, 1.1vw, 16px); text-transform: uppercase; letter-spacing: .08em; font-weight: 800; color: var(--text-muted); }
+.barra-fila.mas .barra-marca { color: var(--accent-ink); }
 .top li .p { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--accent-ink); font-weight: 850; }
 .dato { background: var(--accent-soft); color: var(--text); border-radius: 18px; padding: 1.4vw 1.8vw; font-size: clamp(16px, 1.9vw, 30px); line-height: 1.35; }
 
