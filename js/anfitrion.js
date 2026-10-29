@@ -175,7 +175,7 @@ function vistaLobby() {
         <div class="animales" id="animales"></div>
         <div class="acciones">
           <button class="btn" id="principal" disabled>Empezar</button>
-          <span class="vacio" id="nota">Cada uno recibe un animal al azar: solo tú sabes cuál eres.</span>
+          <span class="vacio" id="nota">Cada uno recibe un personaje de la Biblia al azar: solo tú sabes cuál eres.</span>
         </div>
       </div>
     </div></div>`;
@@ -251,9 +251,9 @@ function vistaFin() {
   const gana = orden[0];
   return `<div class="host"><div class="fin">
     <p class="eyebrow">Fin del juego</p>
-    <h1>${gana ? `¡Gana el ${gana.animal} ${gana.emoji}!` : "¡Gracias por jugar!"}</h1>
+    <h1>${gana ? `¡Gana ${gana.animal} ${gana.emoji}!` : "¡Gracias por jugar!"}</h1>
     <div class="podio">${col(orden[1], 2)}${col(orden[0], 1)}${col(orden[2], 3)}</div>
-    <p class="vacio">Si eres ese animal, levanta la mano… o quédate en secreto. 🤫</p>
+    <p class="vacio">Si eres ese personaje, levanta la mano… o quédate en secreto. 🤫</p>
     <div class="acciones"><button class="btn ghost" id="btnNueva">Partida nueva</button></div>
   </div></div>`;
 }

@@ -2,11 +2,11 @@
 
 Trivia en vivo para la reunión del Día de las Iglesias Evangélicas y Protestantes.
 El anfitrión proyecta la pantalla, la gente entra escaneando un QR y juega desde su celular.
-Cada jugador recibe un animal al azar: en el proyector nadie ve nombres, y cada uno ve en privado si acertó.
+Cada jugador recibe un personaje de la Biblia al azar: en el proyector nadie ve nombres, y cada uno ve en privado si acertó.
 
 - `anfitrion.html` — pantalla del proyector (QR, preguntas, resultados, podio).
 - `jugar.html` — pantalla del celular (se abre con el QR).
-- `js/datos.js` — **las preguntas** (se pueden editar) y la lista de animales.
+- `js/datos.js` — **las preguntas** (se pueden editar) y la lista de personajes.
 - `js/firebase-config.js` — datos de tu proyecto de Firebase.
 
 Sin cuentas ni apps para los jugadores. Solo necesitan internet (datos móviles o wifi, no tienen que estar en la misma red).

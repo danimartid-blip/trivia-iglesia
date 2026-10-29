@@ -1,5 +1,5 @@
 import { db, MODO } from "./db.js";
-import { PREGUNTAS, FORMAS, ANIMALES } from "./datos.js";
+import { PREGUNTAS, FORMAS, PERSONAJES } from "./datos.js";
 
 const app = document.getElementById("app");
 const params = new URLSearchParams(location.search);
@@ -62,10 +62,10 @@ async function unirse() {
 }
 
 async function asignarAnimal(id) {
-  const orden = ANIMALES.map((_, i) => i).sort(() => Math.random() - 0.5);
+  const orden = PERSONAJES.map((_, i) => i).sort(() => Math.random() - 0.5);
   let animal = null;
   for (const i of orden) {
-    if (await db.claim(ruta(`tomados/${i}`), id)) { animal = ANIMALES[i]; break; }
+    if (await db.claim(ruta(`tomados/${i}`), id)) { animal = PERSONAJES[i]; break; }
   }
   const [nombre, emoji] = animal || [`Visita ${Math.floor(Math.random() * 90 + 10)}`, "🙂"];
   const datos = { animal: nombre, emoji, puntos: 0, ultimo: 0 };
@@ -129,9 +129,9 @@ function pintar() {
 
   if (juego.estado === "lobby") {
     html += `<div class="centro"><div class="gigante">${yo.emoji}</div>
-      <h1>Eres el ${yo.animal}</h1>
+      <h1>Eres ${yo.animal}</h1>
       <span class="secreto">🤫 Solo tú sabes quién eres</span>
-      <p>En la pantalla solo se ve tu animal. Espera a que empiece el juego.</p></div>`;
+      <p>En la pantalla solo se ve tu personaje. Espera a que empiece el juego.</p></div>`;
   } else if (juego.estado === "pregunta" && P) {
     if (miResp) {
       html += `<p class="pregunta-m">${P.texto}</p>`;

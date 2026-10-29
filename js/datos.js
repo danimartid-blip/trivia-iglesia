@@ -62,14 +62,16 @@ export const PREGUNTAS = [
 
 export const FORMAS = ["▲", "●", "■", "◆"];
 
-// Cada jugador recibe un animal al azar: así en la pantalla nadie queda expuesto.
-export const ANIMALES = [
-  ["Zorro", "🦊"], ["Pingüino", "🐧"], ["León", "🦁"], ["Tigre", "🐯"], ["Oso", "🐻"],
-  ["Panda", "🐼"], ["Koala", "🐨"], ["Mono", "🐵"], ["Conejo", "🐰"], ["Ratón", "🐭"],
-  ["Vaca", "🐮"], ["Cerdo", "🐷"], ["Rana", "🐸"], ["Pulpo", "🐙"], ["Delfín", "🐬"],
-  ["Ballena", "🐳"], ["Tiburón", "🦈"], ["Búho", "🦉"], ["Águila", "🦅"], ["Pato", "🦆"],
-  ["Cisne", "🦢"], ["Flamenco", "🦩"], ["Loro", "🦜"], ["Mariposa", "🦋"], ["Abeja", "🐝"],
-  ["Caracol", "🐌"], ["Tortuga", "🐢"], ["Cocodrilo", "🐊"], ["Jirafa", "🦒"], ["Elefante", "🐘"],
-  ["Hipopótamo", "🦛"], ["Rinoceronte", "🦏"], ["Camello", "🐪"], ["Llama", "🦙"], ["Canguro", "🦘"],
-  ["Lobo", "🐺"], ["Ciervo", "🦌"], ["Caballo", "🐴"], ["Erizo", "🦔"], ["Cangrejo", "🦀"],
+// Cada jugador recibe un personaje bíblico al azar: así en la pantalla nadie queda expuesto.
+// (Se deja fuera a Jesús a propósito, para que nunca salga "Casi…" o "Se acabó el tiempo" con su nombre.)
+export const PERSONAJES = [
+  ["David", "🎵"], ["Pablo", "✉️"], ["Pedro", "🎣"], ["Moisés", "🌊"], ["Noé", "🌈"],
+  ["Abraham", "🏕️"], ["Sansón", "💪"], ["Daniel", "🦁"], ["Jonás", "🐋"], ["Ester", "👸"],
+  ["Rut", "🌾"], ["José", "🧥"], ["Elías", "🔥"], ["Débora", "🌴"], ["Gedeón", "🎺"],
+  ["Josué", "🧱"], ["Salomón", "👑"], ["Goliat", "🛡️"], ["Zaqueo", "🌳"], ["María", "🌸"],
+  ["Marta", "🍞"], ["Mateo", "💰"], ["Juan", "🦅"], ["Santiago", "🐚"], ["Andrés", "🐟"],
+  ["Tomás", "🔍"], ["Felipe", "🚶"], ["Lucas", "🩺"], ["Marcos", "🏃"], ["Timoteo", "🎓"],
+  ["Bernabé", "🤝"], ["Silas", "⛓️"], ["Priscila", "🧵"], ["Lidia", "💜"], ["Nehemías", "🏗️"],
+  ["Job", "🙏"], ["Jacob", "🌠"], ["Isaac", "🐑"], ["Samuel", "👂"], ["Eva", "🍎"],
+  ["Adán", "🌱"], ["Natanael", "🍃"], ["Esteban", "🕊️"],
 ];
