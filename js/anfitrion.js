@@ -26,6 +26,7 @@ let vistaActual = "";
 let desuscribirResp = null;
 let respQ = null;
 let revelando = false;
+let curiosidades = {};
 const ruta = (p) => `rooms/${sala}/${p}`;
 
 const urlJugar = () => {
@@ -41,10 +42,12 @@ async function arrancar() {
   if (!j) await db.set(ruta("juego"), { estado: "lobby", q: -1, ronda: 0 });
   db.listen(ruta("juego"), (v) => { juego = v || { estado: "lobby", q: -1, ronda: 0 }; alCambiarJuego(); });
   db.listen(ruta("players"), (v) => { players = v || {}; alCambiarJugadores(); });
+  db.listen(ruta("curiosidades"), (v) => { curiosidades = v || {}; actualizarCuriosidades(); });
   db.listen(ruta("ganadores"), (v) => { ganadores = v || {}; if (juego.estado === "fin") pintar(true); });
   db.listen(ruta("res"), (v) => { res = v || {}; if (juego.estado === "resultado") pintar(true); });
   setInterval(tick, 200);
   addEventListener("keydown", (e) => {
+    if (document.getElementById("cur-overlay")) return;
     if (["Enter", " ", "ArrowRight"].includes(e.key) && !e.target.closest("button, input")) {
       e.preventDefault();
       document.getElementById("principal")?.click();
@@ -199,6 +202,7 @@ function pintar(forzar = false) {
   document.getElementById("principal")?.addEventListener("click", siguiente);
   document.getElementById("btnNueva")?.addEventListener("click", nuevaPartida);
   document.getElementById("btnCerrar")?.addEventListener("click", revelar);
+  actualizarCuriosidades();
   if (juego.estado === "lobby") { dibujarQR(); pintarAnimales(); alCambiarJugadores(); }
   if (juego.estado === "pregunta") { actualizarCuenta(); tick(); }
 }
@@ -217,11 +221,63 @@ function vistaLobby() {
         <div class="animales" id="animales"></div>
         <div class="acciones">
           <button class="btn" id="principal" disabled>Empezar</button>
+          <button class="btn ghost" data-cur hidden></button>
           <span class="vacio" id="nota">Cada uno recibe un personaje de la Biblia al azar: solo tú sabes cuál eres.</span>
         </div>
       </div>
     </div></div>`;
 }
+
+const textosCuriosidades = () => Object.values(curiosidades).map((c) => c && c.t).filter(Boolean);
+
+function actualizarCuriosidades() {
+  const n = textosCuriosidades().length;
+  document.querySelectorAll("[data-cur]").forEach((b) => {
+    b.hidden = n === 0;
+    b.textContent = `📝 Curiosidades (${n})`;
+  });
+}
+
+// pantalla completa para leer una curiosidad a la vez, en orden al azar
+function abrirCuriosidades() {
+  const textos = textosCuriosidades();
+  if (!textos.length || document.getElementById("cur-overlay")) return;
+  for (let i = textos.length - 1; i > 0; i--) {
+    const k = Math.floor(Math.random() * (i + 1));
+    [textos[i], textos[k]] = [textos[k], textos[i]];
+  }
+  let i = 0;
+  const el = document.createElement("div");
+  el.id = "cur-overlay";
+  el.className = "cur-overlay";
+  const cerrar = () => { el.remove(); removeEventListener("keydown", tecla); };
+  const ir = (d) => { i = Math.max(0, Math.min(textos.length - 1, i + d)); pintarCur(); };
+  const tecla = (e) => {
+    if (e.key === "Escape") cerrar();
+    else if (["ArrowRight", " ", "Enter"].includes(e.key)) { e.preventDefault(); ir(1); }
+    else if (e.key === "ArrowLeft") ir(-1);
+  };
+  const pintarCur = () => {
+    el.innerHTML = `<p class="eyebrow">Curiosidad ${i + 1} de ${textos.length} · ¿De quién será?</p>
+      <p class="cur-texto">${esc(textos[i])}</p>
+      <div class="acciones">
+        <button class="btn ghost" data-a="-1" ${i === 0 ? "disabled" : ""}>Anterior</button>
+        <button class="btn" data-a="1" ${i === textos.length - 1 ? "disabled" : ""}>Siguiente</button>
+        <button class="btn ghost" data-a="x">Cerrar</button>
+      </div>`;
+  };
+  el.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-a]");
+    if (!b) return;
+    if (b.dataset.a === "x") cerrar(); else ir(Number(b.dataset.a));
+  });
+  addEventListener("keydown", tecla);
+  document.body.appendChild(el);
+  pintarCur();
+}
+document.addEventListener("click", (e) => { if (e.target.closest("[data-cur]")) abrirCuriosidades(); });
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function dibujarQR() {
   const el = document.getElementById("qr");
@@ -367,7 +423,7 @@ function vistaFin() {
     ${filas.length ? `<div class="recap">${filas.map(({ R, r, g }, i) => `<div class="fila" style="animation-delay:${i * 200}ms">
       <span class="rn">Ronda ${r + 1} · ${R.titulo}</span><span class="gan">${g.emoji} ${g.animal}</span><span class="pts">${g.puntos} pts</span></div>`).join("")}</div>
     <p class="vacio">¡Ahora sí! ${[...new Set(filas.map((x) => x.g.animal))].join(", ")}: levanten la mano y reciban su aplauso 🙌👏</p>` : ""}
-    <div class="acciones"><button class="btn ghost" id="btnNueva">Partida nueva</button></div>
+    <div class="acciones"><button class="btn ghost" data-cur hidden></button><button class="btn ghost" id="btnNueva">Partida nueva</button></div>
   </div></div>`;
 }
 

@@ -53,6 +53,7 @@ async function unirse() {
     // el id se guarda ANTES de pedir personaje: si la página se recarga a medio camino
     // (señal lenta, volver atrás), el mismo celular recupera su personaje y no toma otro
     if (!pid) { pid = Math.random().toString(36).slice(2, 10); store.setItem(`trivia_pid_${sala}`, pid); }
+    if (!(await db.get(ruta(`curiosidades/${pid}`)))) await pedirCuriosidad();
     yo = await asignarAnimal(pid);
   } else {
     yo = existente;
@@ -60,6 +61,38 @@ async function unirse() {
   db.listen(ruta("juego"), (v) => { juego = v; alCambiarJuego(); });
   db.listen(ruta("players"), (v) => { players = v || {}; yo = players[pid] || yo; pintar(); });
   setInterval(tick, 250);
+}
+
+const EJEMPLOS = [
+  "Nunca he subido a un avión.",
+  "De niño me quedé encerrado en un ascensor.",
+  "Sé tocar un instrumento, aunque casi nadie me ha escuchado.",
+  "Mi comida favorita de niño era el arroz con leche.",
+];
+
+// Antes de recibir personaje, cada persona deja una curiosidad suya (anónima, sin nombre).
+// Se guardan para leerlas en voz alta durante el compartir.
+function pedirCuriosidad() {
+  return new Promise((resolver) => {
+    mensaje(`<div class="curio">
+      <div class="gigante">✍️</div>
+      <h1>Cuéntanos una curiosidad tuya</h1>
+      <p>Algo que casi nadie sepa de ti. Sin tu nombre: después la leemos y todos adivinamos de quién es.</p>
+      <div class="ejemplos"><b>Por ejemplo</b>${EJEMPLOS.map((e) => `<span>“${e}”</span>`).join("")}</div>
+      <textarea id="cur" maxlength="160" rows="3" placeholder="Escribe aquí tu curiosidad…"></textarea>
+      <span class="ayuda">Que sea algo que te dé gusto contar. Si prefieres, tu comida favorita de niño sirve.</span>
+      <button class="btn" id="curListo" disabled>Listo</button></div>`);
+    const ta = document.getElementById("cur");
+    const btn = document.getElementById("curListo");
+    ta.addEventListener("input", () => { btn.disabled = ta.value.trim().length < 4; });
+    btn.addEventListener("click", async () => {
+      const t = ta.value.trim().slice(0, 160);
+      if (t.length < 4) return;
+      btn.disabled = true; btn.textContent = "Guardando…";
+      try { await db.set(ruta(`curiosidades/${pid}`), { t }); resolver(); }
+      catch { btn.disabled = false; btn.textContent = "Listo"; }
+    });
+  });
 }
 
 async function asignarAnimal(id) {
